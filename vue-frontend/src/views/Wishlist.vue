@@ -1,0 +1,64 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '../api'
+import ProductCard from '../components/ProductCard.vue'
+import EmptyState from '../components/EmptyState.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
+import { useToast } from '../composables/useToast'
+
+const toast = useToast()
+const items = ref([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/wishlists')
+    items.value = res.data
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+})
+
+async function remove(id) {
+  try {
+    await api.delete(`/wishlists/${id}`)
+    items.value = items.value.filter(i => i.id !== id)
+    toast.success('Removed from wishlist')
+  } catch (e) {
+    toast.error('Error removing item')
+  }
+}
+</script>
+
+<template>
+  <h1 class="mb-4">
+    <i class="bi bi-heart me-2 text-danger"></i>My Wishlist
+  </h1>
+  <LoadingSpinner v-if="loading" />
+  <EmptyState
+    v-else-if="items.length === 0"
+    icon="bi-heartbreak"
+    title="Your wishlist is empty"
+    message="Save items you love to your wishlist."
+    linkTo="/products"
+    linkText="Browse Products"
+  />
+  <div v-else class="row">
+    <div v-for="item in items" :key="item.id" class="col-md-3 mb-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="position-relative">
+          <ProductCard :product="item.product" />
+          <button
+            class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
+            @click="remove(item.id)"
+            title="Remove"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
