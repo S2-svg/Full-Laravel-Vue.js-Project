@@ -16,7 +16,7 @@ async function login() {
   try {
     await auth.handleLogin(form.value)
     if (auth.isAdmin.value) {
-      window.location.href = 'http://localhost:8000/admin/dashboard'
+      router.push('/admin')
     } else {
       router.push('/')
     }

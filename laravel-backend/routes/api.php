@@ -12,7 +12,7 @@ Route::get('products/{id}/reviews', [App\Http\Controllers\Api\ReviewController::
 
 // Auth APIs
 Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
-Route::middleware('web')->post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 
 // Protected APIs
 Route::middleware('auth:sanctum')->group(function () {
