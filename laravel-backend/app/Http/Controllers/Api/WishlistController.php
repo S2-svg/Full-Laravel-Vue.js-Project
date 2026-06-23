@@ -10,12 +10,20 @@ class WishlistController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot access wishlist'], 403);
+        }
+
         $wishlists = $request->user()->wishlists()->with('product')->get();
         return response()->json($wishlists);
     }
 
     public function store(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot modify wishlist'], 403);
+        }
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
@@ -30,6 +38,10 @@ class WishlistController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot modify wishlist'], 403);
+        }
+
         $wishlist = $request->user()->wishlists()->findOrFail($id);
         $wishlist->delete();
 

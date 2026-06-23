@@ -10,12 +10,20 @@ class CartController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot access cart'], 403);
+        }
+
         $carts = $request->user()->carts()->with('product')->get();
         return response()->json($carts);
     }
 
     public function store(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot add to cart'], 403);
+        }
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
@@ -36,6 +44,10 @@ class CartController extends Controller
 
     public function update(Request $request, $id)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot modify cart'], 403);
+        }
+
         $request->validate([
             'quantity' => 'required|integer|min:1',
         ]);
@@ -48,6 +60,10 @@ class CartController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot modify cart'], 403);
+        }
+
         $cart = $request->user()->carts()->findOrFail($id);
         $cart->delete();
 

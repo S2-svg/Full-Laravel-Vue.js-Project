@@ -123,7 +123,7 @@ async function submitReview() {
           </span>
         </p>
         <p class="text-muted">{{ product.description }}</p>
-        <div class="d-flex gap-2 mt-4">
+        <div class="d-flex gap-2 mt-4" v-if="!auth.isAdmin">
           <button
             class="btn btn-primary"
             :disabled="addingCart"
@@ -151,7 +151,7 @@ async function submitReview() {
       <i class="bi bi-star me-2 text-warning"></i>Reviews
     </h3>
 
-    <div v-if="auth.isLoggedIn" class="card p-3 mb-4 border-0 shadow-sm">
+    <div v-if="auth.isLoggedIn && !auth.isAdmin" class="card p-3 mb-4 border-0 shadow-sm">
       <h5>Write a Review</h5>
       <p v-if="reviewError" class="text-danger small">{{ reviewError }}</p>
       <div class="mb-2">
@@ -168,6 +168,9 @@ async function submitReview() {
       <button class="btn btn-primary btn-sm" @click="submitReview">
         <i class="bi bi-send me-1"></i>Submit Review
       </button>
+    </div>
+    <div v-else-if="auth.isLoggedIn && auth.isAdmin" class="alert alert-warning">
+      <i class="bi bi-shield-lock me-1"></i>Admins cannot write reviews.
     </div>
     <div v-else class="alert alert-info">
       <i class="bi bi-info-circle me-1"></i>

@@ -16,6 +16,10 @@ class ReviewController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot write reviews'], 403);
+        }
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',

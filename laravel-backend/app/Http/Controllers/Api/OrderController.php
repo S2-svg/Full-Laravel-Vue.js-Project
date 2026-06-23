@@ -13,12 +13,20 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot access orders'], 403);
+        }
+
         $orders = $request->user()->orders()->with('items.product')->latest()->get();
         return response()->json($orders);
     }
 
     public function store(Request $request)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot place orders'], 403);
+        }
+
         $carts = $request->user()->carts()->with('product')->get();
 
         if ($carts->isEmpty()) {
@@ -52,6 +60,10 @@ class OrderController extends Controller
 
     public function show(Request $request, $id)
     {
+        if ($request->user()->role === 'admin') {
+            return response()->json(['message' => 'Admins cannot access orders'], 403);
+        }
+
         $order = $request->user()->orders()->with('items.product')->findOrFail($id);
         return response()->json($order);
     }
