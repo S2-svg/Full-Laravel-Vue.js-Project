@@ -19,14 +19,14 @@ class CategoryProductSeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            Category::create($cat);
+            Category::firstOrCreate(['slug' => $cat['slug']], $cat);
         }
 
         $products = [
         ];
 
         foreach ($products as $prod) {
-            Product::create($prod);
+            Product::firstOrCreate(['slug' => $prod['slug']], $prod);
         }
     }
 }
