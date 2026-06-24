@@ -28,43 +28,48 @@ const statusBadge = (status) => ({
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading" />
-  <div v-else-if="order">
-    <router-link to="/orders" class="btn btn-sm btn-outline-secondary mb-3">
+  <div v-if="order" class="fade-in-up">
+    <router-link to="/orders" class="btn btn-outline-secondary mb-3">
       <i class="bi bi-arrow-left me-1"></i>Back to Orders
     </router-link>
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Order #{{ order.order_number }}</h5>
-        <span class="badge" :class="statusBadge(order.status)">{{ order.status }}</span>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold">
+          <i class="bi bi-receipt me-2 text-primary"></i>Order #{{ order.order_number }}
+        </h5>
+        <span class="badge rounded-pill" :class="statusBadge(order.status)">{{ order.status }}</span>
       </div>
       <div class="card-body">
-        <p class="text-muted">
-          Placed: {{ new Date(order.created_at).toLocaleDateString() }}
+        <p class="text-muted small mb-3">
+          <i class="bi bi-calendar me-1"></i>Placed: {{ new Date(order.created_at).toLocaleDateString() }}
         </p>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in order.items" :key="item.id">
-              <td>{{ item.product?.name }}</td>
-              <td>${{ item.price }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>${{ (item.price * item.quantity).toFixed(2) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="table-light">
+              <tr>
+                <th>Product</th>
+                <th class="text-end">Price</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in order.items" :key="item.id">
+                <td class="fw-medium">{{ item.product?.name }}</td>
+                <td class="text-end">${{ item.price }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end fw-semibold">${{ (item.price * item.quantity).toFixed(2) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <hr />
         <div class="text-end">
-          <h4 class="mb-0">Total: ${{ order.total }}</h4>
+          <h4 class="mb-0 text-primary fw-bold">Total: ${{ order.total }}</h4>
         </div>
       </div>
     </div>
   </div>
+  <LoadingSpinner v-else />
 </template>

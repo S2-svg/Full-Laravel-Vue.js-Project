@@ -52,23 +52,27 @@ function goToPage(page) {
 </script>
 
 <template>
-  <h1 class="mb-4">
-    <i class="bi bi-grid me-2 text-primary"></i>Products
-  </h1>
+  <div class="section-header">
+    <span class="header-icon"><i class="bi bi-grid"></i></span>
+    <h2>Products</h2>
+    <span class="header-line"></span>
+  </div>
 
-  <div class="row mb-4 g-2">
-    <div class="col-md-5">
-      <div class="input-group">
-        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-        <input v-model="searchQuery" class="form-control" placeholder="Search products..." @keyup.enter="search">
-        <button class="btn btn-primary" @click="search">Search</button>
+  <div class="card border-0 shadow-sm mb-4 p-3">
+    <div class="row g-2">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <input v-model="searchQuery" class="form-control" placeholder="Search products..." @keyup.enter="search">
+          <button class="btn btn-primary" @click="search">Search</button>
+        </div>
       </div>
-    </div>
-    <div class="col-md-3">
-      <select v-model="selectedCategory" class="form-select" @change="search">
-        <option value="">All Categories</option>
-        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-      </select>
+      <div class="col-md-3">
+        <select v-model="selectedCategory" class="form-select" @change="search">
+          <option value="">All Categories</option>
+          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -79,7 +83,7 @@ function goToPage(page) {
     <p class="text-muted">Try adjusting your search or filter criteria.</p>
   </div>
   <div v-else class="row">
-    <div v-for="product in products" :key="product.id" class="col-md-3 mb-4">
+    <div v-for="product in products" :key="product.id" class="col-6 col-md-3 mb-4">
       <ProductCard :product="product" />
     </div>
   </div>

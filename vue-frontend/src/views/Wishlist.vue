@@ -33,9 +33,12 @@ async function remove(id) {
 </script>
 
 <template>
-  <h1 class="mb-4">
-    <i class="bi bi-heart me-2 text-danger"></i>My Wishlist
-  </h1>
+  <div class="section-header">
+    <span class="header-icon"><i class="bi bi-heart"></i></span>
+    <h2>My Wishlist</h2>
+    <span class="header-line"></span>
+  </div>
+
   <LoadingSpinner v-if="loading" />
   <EmptyState
     v-else-if="items.length === 0"
@@ -46,12 +49,13 @@ async function remove(id) {
     linkText="Browse Products"
   />
   <div v-else class="row">
-    <div v-for="item in items" :key="item.id" class="col-md-3 mb-4">
-      <div class="card h-100 border-0 shadow-sm">
+    <div v-for="item in items" :key="item.id" class="col-6 col-md-3 mb-4">
+      <div class="card h-100 product-card border-0 shadow-sm">
         <div class="position-relative">
           <ProductCard :product="item.product" />
           <button
             class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
+            style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
             @click="remove(item.id)"
             title="Remove"
           >

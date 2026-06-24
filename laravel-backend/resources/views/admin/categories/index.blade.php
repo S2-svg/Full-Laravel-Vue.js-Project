@@ -15,7 +15,7 @@
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Image</th>

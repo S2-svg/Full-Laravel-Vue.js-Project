@@ -31,57 +31,78 @@ async function register() {
 </script>
 
 <template>
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-5 col-lg-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-          <div class="text-center mb-4">
-            <i class="bi bi-person-plus fs-1 text-primary"></i>
-            <h3 class="mt-2 fw-bold">Create Account</h3>
-            <p class="text-muted small">Join us and start shopping</p>
-          </div>
-          <p v-if="error" class="text-danger text-center small">
-            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
-          </p>
-          <form @submit.prevent="register">
-            <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input v-model="form.name" class="form-control" placeholder="Your full name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input v-model="form.email" type="email" class="form-control" placeholder="you@example.com" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <div class="input-group">
-                <input v-model="form.password" :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="At least 8 characters" required minlength="8">
-                <button class="btn btn-outline-secondary" type="button" @click="showPassword = !showPassword">
-                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Confirm Password</label>
-              <div class="input-group">
-                <input v-model="form.password_confirmation" :type="showConfirmPassword ? 'text' : 'password'" class="form-control" placeholder="Repeat your password" required>
-                <button class="btn btn-outline-secondary" type="button" @click="showConfirmPassword = !showConfirmPassword">
-                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100" :disabled="loading">
-              <i v-if="loading" class="bi bi-hourglass-split me-2"></i>
-              <i v-else class="bi bi-person-plus me-2"></i>
-              {{ loading ? 'Creating Account...' : 'Create Account' }}
-            </button>
-          </form>
-          <p class="text-center mt-3 mb-0">
-            <span class="text-muted small">Already have an account?</span>
-            <router-link to="/login" class="small ms-1">Login</router-link>
-          </p>
-        </div>
+  <div class="login-wrapper">
+    <div class="login-brand text-center mb-4">
+      <div class="login-brand-icon">
+        <i class="bi bi-person-plus"></i>
       </div>
+      <h1>Create Account</h1>
+      <p class="text-muted">Join GlobalStore and start shopping today</p>
+    </div>
+
+    <div class="login-card">
+      <p v-if="error" class="error-alert" role="alert">
+        <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+      </p>
+      <form @submit.prevent="register">
+        <div class="mb-3">
+          <label for="name" class="form-label">Full Name</label>
+          <input v-model="form.name" type="text" id="name" class="form-control" placeholder="Your full name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input v-model="form.email" type="email" id="email" class="form-control" placeholder="you@example.com" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group-custom">
+            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" class="form-control" placeholder="At least 8 characters" required minlength="8">
+            <button type="button" class="toggle-password" data-target="password" aria-label="Toggle password">
+              <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="password_confirmation" class="form-label">Confirm Password</label>
+          <div class="input-group-custom">
+            <input v-model="form.password_confirmation" :type="showConfirmPassword ? 'text' : 'password'" id="password_confirmation" class="form-control" placeholder="Repeat your password" required>
+            <button type="button" class="toggle-password" data-target="password_confirmation" aria-label="Toggle confirm password">
+              <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-login w-100">
+          <i v-if="loading" class="bi bi-hourglass-split me-2"></i>
+          <i v-else class="bi bi-person-plus me-2"></i>
+          {{ loading ? 'Creating Account...' : 'Create Account' }}
+        </button>
+      </form>
+      <p class="footer-text mt-3">
+        Already have an account?
+        <router-link to="/login">Sign in</router-link>
+      </p>
     </div>
   </div>
 </template>
+
+<style scoped>
+.login-wrapper {
+  max-width: 440px;
+  margin: 3rem auto;
+}
+
+.login-brand h1 {
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.login-brand p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.login-card {
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+}
+</style>

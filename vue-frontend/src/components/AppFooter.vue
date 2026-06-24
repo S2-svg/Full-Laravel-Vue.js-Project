@@ -7,8 +7,9 @@ const year = new Date().getFullYear()
     <div class="container">
       <div class="row g-4">
         <div class="col-md-4">
-          <h5 class="fw-bold mb-3">
-            <i class="bi bi-shop me-2" style="color: #667eea;"></i>GlobalStore
+          <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-shop" style="color: var(--color-primary);"></i>
+            <span>GlobalStore</span>
           </h5>
           <p class="text-white-50 small lh-lg" style="max-width: 280px;">
             Your one-stop shop for amazing products at unbeatable prices. Quality guaranteed, satisfaction ensured.
@@ -21,23 +22,23 @@ const year = new Date().getFullYear()
           </div>
         </div>
         <div class="col-md-2 offset-md-1">
-          <h6 class="fw-bold mb-3" style="color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;">Shop</h6>
+          <h6 class="fw-bold mb-3 text-uppercase" style="color: #94a3b8; letter-spacing: 1px; font-size: 11px;">Shop</h6>
           <ul class="list-unstyled small d-flex flex-column gap-2">
-            <li><router-link to="/" class="text-white-50 text-decoration-none nav-link-hover">Home</router-link></li>
-            <li><router-link to="/products" class="text-white-50 text-decoration-none nav-link-hover">Products</router-link></li>
-            <li><router-link to="/cart" class="text-white-50 text-decoration-none nav-link-hover">Cart</router-link></li>
+            <li><router-link to="/" class="text-white-50 text-decoration-none">Home</router-link></li>
+            <li><router-link to="/products" class="text-white-50 text-decoration-none">Products</router-link></li>
+            <li><router-link to="/cart" class="text-white-50 text-decoration-none">Cart</router-link></li>
           </ul>
         </div>
         <div class="col-md-2">
-          <h6 class="fw-bold mb-3" style="color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;">Account</h6>
+          <h6 class="fw-bold mb-3 text-uppercase" style="color: #94a3b8; letter-spacing: 1px; font-size: 11px;">Account</h6>
           <ul class="list-unstyled small d-flex flex-column gap-2">
-            <li><router-link to="/profile" class="text-white-50 text-decoration-none nav-link-hover">Profile</router-link></li>
-            <li><router-link to="/orders" class="text-white-50 text-decoration-none nav-link-hover">Orders</router-link></li>
-            <li><router-link to="/wishlist" class="text-white-50 text-decoration-none nav-link-hover">Wishlist</router-link></li>
+            <li><router-link to="/profile" class="text-white-50 text-decoration-none">Profile</router-link></li>
+            <li><router-link to="/orders" class="text-white-50 text-decoration-none">Orders</router-link></li>
+            <li><router-link to="/wishlist" class="text-white-50 text-decoration-none">Wishlist</router-link></li>
           </ul>
         </div>
         <div class="col-md-2">
-          <h6 class="fw-bold mb-3" style="color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;">Support</h6>
+          <h6 class="fw-bold mb-3 text-uppercase" style="color: #94a3b8; letter-spacing: 1px; font-size: 11px;">Support</h6>
           <ul class="list-unstyled small d-flex flex-column gap-2">
             <li><i class="bi bi-envelope me-2 text-white-50"></i><span class="text-white-50">support@store.com</span></li>
             <li><i class="bi bi-telephone me-2 text-white-50"></i><span class="text-white-50">+1 (555) 123-4567</span></li>

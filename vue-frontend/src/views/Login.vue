@@ -29,44 +29,85 @@ async function login() {
 </script>
 
 <template>
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-5 col-lg-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-          <div class="text-center mb-4">
-            <i class="bi bi-shop fs-1 text-primary"></i>
-            <h3 class="mt-2 fw-bold">Welcome Back</h3>
-            <p class="text-muted small">Sign in to your account</p>
-          </div>
-          <p v-if="error" class="text-danger text-center small">
-            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
-          </p>
-          <form @submit.prevent="login">
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input v-model="form.email" type="email" class="form-control" placeholder="you@example.com" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <div class="input-group">
-                <input v-model="form.password" :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="Enter your password" required>
-                <button class="btn btn-outline-secondary" type="button" @click="showPassword = !showPassword">
-                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100" :disabled="loading">
-              <i v-if="loading" class="bi bi-hourglass-split me-2"></i>
-              <i v-else class="bi bi-box-arrow-in-right me-2"></i>
-              {{ loading ? 'Signing in...' : 'Sign In' }}
-            </button>
-          </form>
-          <p class="text-center mt-3 mb-0">
-            <span class="text-muted small">Don't have an account?</span>
-            <router-link to="/register" class="small ms-1">Register</router-link>
-          </p>
-        </div>
+  <div class="login-wrapper">
+    <div class="login-brand text-center mb-4">
+      <div class="login-brand-icon">
+        <i class="bi bi-shop"></i>
       </div>
+      <h1>Welcome Back</h1>
+      <p class="text-muted">Sign in to your GlobalStore account</p>
+    </div>
+
+    <div class="login-card">
+      <p v-if="error" class="error-alert" role="alert">
+        <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+      </p>
+      <form @submit.prevent="login">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input
+            v-model="form.email"
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+            autofocus
+          >
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group-custom">
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              class="form-control"
+              placeholder="••••••••"
+              required
+            >
+            <button
+              type="button"
+              class="toggle-password"
+              data-target="password"
+              aria-label="Toggle password"
+            >
+              <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-login w-100">
+          <i v-if="loading" class="bi bi-hourglass-split me-2"></i>
+          <i v-else class="bi bi-box-arrow-in-right me-2"></i>
+          {{ loading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </form>
+      <p class="footer-text mt-3">
+        Don't have an account?
+        <router-link to="/register">Create one</router-link>
+      </p>
     </div>
   </div>
 </template>
+
+<style scoped>
+.login-wrapper {
+  max-width: 440px;
+  margin: 3rem auto;
+}
+
+.login-brand h1 {
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.login-brand p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.login-card {
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+}
+</style>

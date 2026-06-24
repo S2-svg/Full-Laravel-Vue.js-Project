@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function index($productId)
+    public function index($productId = null)
     {
-        $reviews = Review::with('user')->where('product_id', $productId)->latest()->get();
+        if ($productId) {
+            $reviews = Review::with('user')->where('product_id', $productId)->latest()->get();
+        } else {
+            $reviews = Review::with(['user', 'product'])->latest()->limit(20)->get();
+        }
         return response()->json($reviews);
     }
 

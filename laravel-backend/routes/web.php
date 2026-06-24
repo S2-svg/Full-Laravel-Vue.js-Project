@@ -36,5 +36,11 @@ Route::prefix('admin')->group(function () {
         Route::put('orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.update');
 
         Route::get('users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+
+        // Notifications
+        Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('admin.notifications.unread-count');
+        Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
+        Route::post('notifications/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+        Route::post('notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('admin.notifications.read-all');
     });
 });

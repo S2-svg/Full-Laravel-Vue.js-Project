@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminNotification;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -46,6 +47,13 @@ class OrderController extends Controller
         }
 
         Cart::where('user_id', $request->user()->id)->delete();
+
+        // Notify admin about the new order
+        AdminNotification::create([
+            'type' => 'new_order',
+            'message' => 'New order #' . $order->order_number . ' from ' . $request->user()->name,
+            'order_id' => $order->id,
+        ]);
 
         return response()->json(Order::with('items.product')->find($order->id), 201);
     }
