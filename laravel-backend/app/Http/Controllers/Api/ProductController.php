@@ -30,7 +30,6 @@ class ProductController extends Controller
 
         $perPage = $request->per_page ?? 12;
         $products = $query->paginate($perPage);
-        $products->each->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($products);
     }
 

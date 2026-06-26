@@ -15,7 +15,6 @@ class CategoryController extends Controller
     public function show($id)
     {
         $category = Category::with('products')->findOrFail($id);
-        $category->products->each->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($category);
     }
 }
