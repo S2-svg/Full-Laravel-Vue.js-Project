@@ -1,0 +1,42 @@
+<<<<<<< HEAD
+=======
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Wishlist;
+use Illuminate\Http\Request;
+
+class WishlistController extends Controller
+{
+    public function index(Request $request)
+    {
+        $wishlists = $request->user()->wishlists()->with('product')->get();
+        $wishlists->each(fn($w) => $w->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
+        return response()->json($wishlists);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $wishlist = Wishlist::firstOrCreate([
+            'user_id' => $request->user()->id,
+            'product_id' => $request->product_id,
+        ]);
+
+        return response()->json($wishlist, 201);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $wishlist = $request->user()->wishlists()->findOrFail($id);
+        $wishlist->delete();
+
+        return response()->json(['message' => 'Removed from wishlist']);
+    }
+}
+>>>>>>> 270228540f02abaf2f4f0faeff3c16802c8a4e67

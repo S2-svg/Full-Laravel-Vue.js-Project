@@ -1,0 +1,91 @@
+<<<<<<< HEAD
+=======
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class CategoryController extends Controller
+{
+    public function index()
+    {
+        $categories = Category::withCount('products')->latest()->get();
+
+        $totalCategories = $categories->count();
+        $totalProducts   = $categories->sum('products_count');
+        $hasProducts     = $categories->where('products_count', '>', 0)->count();
+        $emptyCategories = $categories->where('products_count', 0)->count();
+
+        return view('admin.categories.index', compact(
+            'categories', 'totalCategories', 'totalProducts', 'hasProducts', 'emptyCategories'
+        ));
+    }
+
+    public function create()
+    {
+        return view('admin.categories.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+        ];
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        Category::create($data);
+        return redirect('/admin/categories')->with('success', 'Category created');
+    }
+
+    public function edit($id)
+    {
+        $category = Category::findOrFail($id);
+        return view('admin.categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+        ];
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        $category->update($data);
+        return redirect('/admin/categories')->with('success', 'Category updated');
+    }
+
+    public function destroy($id)
+    {
+        Category::findOrFail($id)->delete();
+        return redirect('/admin/categories')->with('success', 'Category deleted');
+    }
+}
+>>>>>>> 270228540f02abaf2f4f0faeff3c16802c8a4e67
