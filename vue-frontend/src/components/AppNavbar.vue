@@ -12,7 +12,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
         <span class="brand-icon me-2">

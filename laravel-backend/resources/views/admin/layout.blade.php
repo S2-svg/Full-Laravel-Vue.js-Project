@@ -220,7 +220,7 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.logout') }}" class="nav-link text-danger"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="bi bi-box-arrow-left me-2"></i>Logout
+                            <i class="bi bi-box-arrow-left me-2 text-danger"></i> <span class="text-danger">Logout</span>
                         </a>
                         <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                             @csrf
@@ -235,7 +235,26 @@
             <div class="topbar">
                 <h5>@yield('page-title', 'Dashboard')</h5>
                 <div class="topbar-right">
-                    <span class="badge-notif"><i class="bi bi-bell"></i></span>
+                    <div class="dropdown" id="notif-dropdown">
+                      <span class="badge-notif dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notif-bell">
+                        <i class="bi bi-bell"></i>
+                        <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="display: none; font-size: 10px; background: #f43f5e; border: 2px solid #fff; min-width: 18px; height: 18px; align-items: center; justify-content: center; padding: 0 4px;">
+                          0
+                        </span>
+                      </span>
+                      <div class="dropdown-menu dropdown-menu-end shadow-sm" style="width: 340px; max-height: 420px; overflow-y: auto; border-radius: 14px; border: none; padding: 0;" id="notif-menu">
+                        <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom: 1px solid #f0f2f5;">
+                          <h6 class="fw-bold mb-0" style="font-size: 14px;">Notifications</h6>
+                          <button class="btn btn-sm btn-link text-decoration-none p-0" id="mark-all-read" style="font-size: 12px; color: var(--color-primary);">Mark all read</button>
+                        </div>
+                        <div id="notif-list">
+                          <div class="text-center py-4 text-muted small">
+                            <i class="bi bi-bell-slash d-block mb-2 fs-4"></i>
+                            No notifications
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="admin-avatar">A</div>
                 </div>
             </div>
@@ -261,5 +280,171 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @yield('scripts')
+    <script>
+      const notifBadge = document.getElementById('notif-badge');
+      const notifList = document.getElementById('notif-list');
+      const markAllBtn = document.getElementById('mark-all-read');
+      const notifDropdownEl = document.getElementById('notif-dropdown');
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+      async function fetchUnreadCount() {
+        try {
+          const res = await fetch('{{ route("admin.notifications.unread-count") }}');
+          const data = await res.json();
+          updateBadge(data.count);
+        } catch (e) {
+          console.error('Notif fetch error:', e);
+        }
+      }
+
+      function updateBadge(count) {
+        if (count > 0) {
+          notifBadge.style.display = 'flex';
+          notifBadge.textContent = count > 99 ? '99+' : count;
+          // Pulse animation
+          notifBadge.style.animation = 'none';
+          notifBadge.offsetHeight;
+          notifBadge.style.animation = 'notifPulse 0.4s ease';
+        } else {
+          notifBadge.style.display = 'none';
+        }
+      }
+
+      async function fetchNotifications() {
+        try {
+          const res = await fetch('{{ route("admin.notifications.index") }}');
+          const notifications = await res.json();
+          renderNotifications(notifications);
+        } catch (e) {
+          console.error('Notif list fetch error:', e);
+        }
+      }
+
+      function renderNotifications(notifications) {
+        if (!notifications || notifications.length === 0) {
+          notifList.innerHTML = '<div class="text-center py-4 text-muted small"><i class="bi bi-bell-slash d-block mb-2 fs-4"></i>No notifications</div>';
+          return;
+        }
+        notifList.innerHTML = notifications.map(n => {
+          const isUnread = !n.read_at;
+          const time = new Date(n.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+          // Determine link and icon based on notification type
+          let icon = 'bi-cart';
+          let iconBg = isUnread ? 'linear-gradient(135deg, #667eea, #764ba2)' : '#f0f2f5';
+          let iconColor = isUnread ? '#fff' : '#6b7280';
+
+          if (n.type === 'low_stock') {
+            icon = 'bi-exclamation-triangle';
+            iconBg = isUnread ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : '#fef3c7';
+            iconColor = isUnread ? '#fff' : '#92400e';
+          }
+
+          let detailUrl = '#';
+          if (n.order_id) detailUrl = '/admin/orders/' + n.order_id;
+          else if (n.product_id) detailUrl = '/admin/products';
+
+          return '<a href="' + detailUrl + '" class="notif-item dropdown-item d-flex align-items-start gap-3 px-3 py-3 ' + (isUnread ? 'notif-unread' : '') + '" style="border-bottom: 1px solid #f0f2f5; text-decoration: none; color: inherit;" data-id="' + n.id + '">' +
+            '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: ' + iconBg + '; color: ' + iconColor + '; font-size: 16px;">' +
+              '<i class="bi ' + icon + '"></i>' +
+            '</div>' +
+            '<div class="flex-grow-1 min-w-0" style="max-width: 240px;">' +
+              '<div class="small fw-semibold mb-0" style="font-size: 13px; white-space: normal; line-height: 1.4;">' + n.message + '</div>' +
+              '<div class="text-muted" style="font-size: 11px; margin-top: 2px;">' + time + '</div>' +
+            '</div>' +
+            (isUnread ? '<span class="rounded-circle flex-shrink-0" style="width: 8px; height: 8px; background: #667eea; margin-top: 6px;"></span>' : '') +
+          '</a>';
+        }).join('');
+
+        // Click handler to mark as read
+        document.querySelectorAll('.notif-item').forEach(el => {
+          el.addEventListener('click', function(e) {
+            const id = this.dataset.id;
+            if (id) {
+              fetch('/admin/notifications/' + id + '/read', { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken } }).catch(() => {});
+            }
+          });
+        });
+      }
+
+      // Mark all as read
+      if (markAllBtn) {
+        markAllBtn.addEventListener('click', async function() {
+          try {
+            await fetch('{{ route("admin.notifications.read-all") }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken } });
+            fetchNotifications();
+            fetchUnreadCount();
+          } catch (e) {
+            console.error('Mark all read error:', e);
+          }
+        });
+      }
+
+      // ── Real-time EventSource (SSE) ──────────────────────────
+      // Connect to the SSE stream to push new notifications the
+      // instant they are created — no polling delay needed.
+      let notifEventSource = null;
+      // Seed with the current max ID so we don't replay existing notifications
+      let lastNotifId = {{ \App\Models\AdminNotification::max('id') ?? 0 }};
+
+      function connectNotifSSE() {
+        const url = '{{ route("admin.notifications.stream") }}?last_id=' + lastNotifId;
+        notifEventSource = new EventSource(url);
+
+        notifEventSource.addEventListener('notification', function (e) {
+          const notif = JSON.parse(e.data);
+          lastNotifId = Math.max(lastNotifId, notif.id);
+
+          // Pulse the bell badge
+          fetchUnreadCount();
+
+          // If the dropdown is open, refresh the list
+          if (notifDropdownEl && notifDropdownEl.classList.contains('show')) {
+            fetchNotifications();
+          }
+        });
+
+        notifEventSource.onerror = function () {
+          // Close & reconnect manually after a delay to avoid rapid retry storms
+          notifEventSource.close();
+          setTimeout(connectNotifSSE, 3000);
+        };
+      }
+
+      // Initial fetch for badge + connect SSE
+      fetchUnreadCount();
+      connectNotifSSE();
+
+      // Refresh notifications list when dropdown opens
+      if (notifDropdownEl) {
+        notifDropdownEl.addEventListener('show.bs.dropdown', function() {
+          fetchNotifications();
+        });
+      }
+
+      // Pulse animation
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = `
+        @keyframes notifPulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.3); }
+          100% { transform: scale(1); }
+        }
+        .notif-unread {
+          background: rgba(102,126,234,0.04);
+        }
+        .notif-item:hover {
+          background: #f8f9fc;
+        }
+        .notif-item:last-child {
+          border-bottom: none !important;
+        }
+        .badge-notif.dropdown-toggle::after {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(styleSheet);
+    </script>
 </body>
 </html>

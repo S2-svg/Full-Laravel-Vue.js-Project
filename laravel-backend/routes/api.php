@@ -9,6 +9,7 @@ Route::get('products/search', [App\Http\Controllers\Api\ProductController::class
 Route::get('products', [App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('products/{id}', [App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('products/{id}/reviews', [App\Http\Controllers\Api\ReviewController::class, 'index']);
+Route::get('reviews', [App\Http\Controllers\Api\ReviewController::class, 'index']);
 
 // Auth APIs
 Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
@@ -39,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
     Route::post('orders', [App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('orders/{id}', [App\Http\Controllers\Api\OrderController::class, 'show']);
+    Route::post('orders/{id}/reorder', [App\Http\Controllers\Api\OrderController::class, 'reorder']);
 
     // Reviews
     Route::post('reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
@@ -52,5 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('orders/{id}', [App\Http\Controllers\Api\Admin\OrderController::class, 'show']);
         Route::put('orders/{id}/status', [App\Http\Controllers\Api\Admin\OrderController::class, 'updateStatus']);
         Route::get('users', [App\Http\Controllers\Api\Admin\UserController::class, 'index']);
+
     });
 });
