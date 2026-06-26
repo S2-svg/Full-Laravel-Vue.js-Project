@@ -4,8 +4,10 @@ import api from '../api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import { useToast } from '../composables/useToast'
 import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
+const router = useRouter()
 const auth = useAuthStore()
 const profile = ref({
   name: '',
@@ -34,6 +36,7 @@ onMounted(async () => {
 
 async function handleLogout() {
   auth.logout()
+  router.push('/')
 }
 
 async function updateProfile() {

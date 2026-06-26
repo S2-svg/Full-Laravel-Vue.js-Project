@@ -92,8 +92,11 @@ async function addToWishlist() {
   }
 }
 
+const isOutOfStock = computed(() => product.value && product.value.stock <= 0)
+
 async function addToCart() {
   if (!auth.isLoggedIn) return router.push('/login')
+  if (isOutOfStock.value) return
   addingCart.value = true
   try {
     await api.post('/carts', { product_id: product.value.id, quantity: 1 })
@@ -154,7 +157,14 @@ async function addToCart() {
           </p>
           <h1 class="fw-bold mb-2">{{ product.name }}</h1>
           <div class="d-flex align-items-center gap-3 mb-3">
-            <span class="text-primary fw-bold" style="font-size: 28px;">${{ product.price }}</span>
+            <div class="d-flex align-items-center gap-2">
+              <span v-if="product.has_discount" class="text-danger fw-bold" style="font-size: 28px;">${{ product.final_price }}</span>
+              <span v-else class="text-primary fw-bold" style="font-size: 28px;">${{ product.price }}</span>
+              <span v-if="product.has_discount" class="text-muted text-decoration-line-through" style="font-size: 18px;">${{ product.price }}</span>
+              <span v-if="product.has_discount" class="badge rounded-pill px-2 py-1" style="background: #ef4444; font-size: 14px; font-weight: 700;">
+                -{{ product.discount_percent }}%
+              </span>
+            </div>
             <span class="badge rounded-pill" :class="product.stock > 0 ? 'bg-success' : 'bg-danger'">
               {{ product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock' }}
             </span>
@@ -162,6 +172,15 @@ async function addToCart() {
           <p class="text-muted mb-4" style="line-height: 1.7;">{{ product.description }}</p>
           <div class="d-flex gap-2 mt-auto">
             <button
+              v-if="isOutOfStock"
+              class="btn btn-secondary btn-lg flex-grow-1"
+              disabled
+              style="opacity: 0.6; cursor: not-allowed;"
+            >
+              <i class="bi bi-x-circle me-2"></i>Out of Stock
+            </button>
+            <button
+              v-else
               class="btn btn-primary btn-lg flex-grow-1"
               :disabled="addingCart"
               @click="addToCart"

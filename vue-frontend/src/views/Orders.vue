@@ -1,11 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '../api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import EmptyState from '../components/EmptyState.vue'
+import { useToast } from '../composables/useToast'
+import { useCartStore } from '../stores/cart'
 
 const orders = ref([])
 const loading = ref(true)
+const reordering = ref(null)
+
+const router = useRouter()
+const toast = useToast()
+const cartStore = useCartStore()
 
 onMounted(async () => {
   try {
@@ -23,6 +31,20 @@ const statusBadge = (status) => ({
   'bg-danger': status === 'cancelled',
   'bg-warning text-dark': status === 'pending' || status === 'processing',
 })
+
+async function reorder(orderId) {
+  reordering.value = orderId
+  try {
+    const res = await api.post(`/orders/${orderId}/reorder`)
+    toast.success(res.data.message || 'Items added to cart')
+    await cartStore.fetchCount()
+    router.push('/cart')
+  } catch (e) {
+    toast.error(e.response?.data?.message || 'Failed to reorder')
+  } finally {
+    reordering.value = null
+  }
+}
 </script>
 
 <template>
@@ -74,15 +96,45 @@ const statusBadge = (status) => ({
           </table>
         </div>
         <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-          <router-link
-            :to="`/orders/${order.id}`"
-            class="btn btn-outline-primary"
-          >
-            <i class="bi bi-eye me-1"></i>View Details
-          </router-link>
+          <div class="d-flex gap-2">
+            <router-link
+              :to="`/orders/${order.id}`"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-eye me-1"></i>View Details
+            </router-link>
+            <button
+              class="btn btn-outline-success"
+              :disabled="reordering === order.id"
+              @click="reorder(order.id)"
+            >
+              <i
+                :class="reordering === order.id ? 'bi-arrow-repeat spinner' : 'bi-arrow-counterclockwise'"
+                class="me-1"
+              ></i>
+              {{ reordering === order.id ? 'Adding...' : 'Reorder' }}
+            </button>
+          </div>
           <h6 class="mb-0 text-primary fw-bold">Total: ${{ order.total }}</h6>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-outline-success:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+</style>

@@ -13,7 +13,16 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->latest()->get();
-        return view('admin.products.index', compact('products'));
+
+        $totalProducts   = $products->count();
+        $lowStock        = $products->where('stock', '>', 0)->where('stock', '<=', 5)->count();
+        $outOfStock      = $products->where('stock', 0)->count();
+        $categoriesCount = Category::count();
+        $categories      = Category::all();
+
+        return view('admin.products.index', compact(
+            'products', 'totalProducts', 'lowStock', 'outOfStock', 'categoriesCount', 'categories'
+        ));
     }
 
     public function create()
@@ -29,6 +38,9 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'discount_start_at' => 'nullable|date',
+            'discount_end_at' => 'nullable|date|after_or_equal:discount_start_at',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -39,6 +51,9 @@ class ProductController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'discount_percent' => (int) $request->input('discount_percent', 0),
+            'discount_start_at' => $request->input('discount_start_at'),
+            'discount_end_at' => $request->input('discount_end_at'),
             'stock' => $request->stock,
         ];
 
@@ -66,6 +81,9 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'discount_start_at' => 'nullable|date',
+            'discount_end_at' => 'nullable|date|after_or_equal:discount_start_at',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -76,6 +94,9 @@ class ProductController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'discount_percent' => (int) $request->input('discount_percent', 0),
+            'discount_start_at' => $request->input('discount_start_at'),
+            'discount_end_at' => $request->input('discount_end_at'),
             'stock' => $request->stock,
         ];
 

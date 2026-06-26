@@ -15,6 +15,7 @@ class OrderController extends Controller
         }
 
         $orders = Order::with('user', 'items.product')->latest()->get();
+        $orders->each(fn($o) => $o->items->each(fn($i) => $i->product?->setAppends(['final_price', 'has_discount', 'discount_status'])));
         return response()->json($orders);
     }
 
@@ -25,6 +26,7 @@ class OrderController extends Controller
         }
 
         $order = Order::with('user', 'items.product')->findOrFail($id);
+        $order->items->each(fn($i) => $i->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
         return response()->json($order);
     }
 
@@ -37,6 +39,8 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $request->validate(['status' => 'required|in:pending,processing,completed,cancelled']);
         $order->update(['status' => $request->status]);
-        return response()->json($order->load('user', 'items.product'));
+        $order->load('user', 'items.product');
+        $order->items->each(fn($i) => $i->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
+        return response()->json($order);
     }
 }

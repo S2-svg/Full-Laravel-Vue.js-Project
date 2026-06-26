@@ -3,11 +3,17 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
+import { useToast } from '../composables/useToast'
+import { useCartStore } from '../stores/cart'
 
 const route = useRoute()
 const router = useRouter()
 const order = ref(null)
 const loading = ref(true)
+const reordering = ref(false)
+
+const toast = useToast()
+const cartStore = useCartStore()
 
 onMounted(async () => {
   try {
@@ -25,6 +31,19 @@ const statusBadge = (status) => ({
   'bg-danger': status === 'cancelled',
   'bg-warning text-dark': status === 'pending' || status === 'processing',
 })
+
+async function reorder() {
+  reordering.value = true
+  try {
+    const res = await api.post(`/orders/${route.params.id}/reorder`)
+    toast.success(res.data.message || 'Items added to cart')
+    await cartStore.fetchCount()
+  } catch (e) {
+    toast.error(e.response?.data?.message || 'Failed to reorder')
+  } finally {
+    reordering.value = false
+  }
+}
 </script>
 
 <template>
@@ -64,8 +83,18 @@ const statusBadge = (status) => ({
             </tbody>
           </table>
         </div>
-        <hr />
-        <div class="text-end">
+        <div class="d-flex justify-content-between align-items-center pt-2">
+          <button
+            class="btn btn-outline-success"
+            :disabled="reordering"
+            @click="reorder()"
+          >
+            <i
+              :class="reordering ? 'bi-arrow-repeat spinner' : 'bi-arrow-counterclockwise'"
+              class="me-1"
+            ></i>
+            {{ reordering ? 'Adding to Cart...' : 'Reorder All' }}
+          </button>
           <h4 class="mb-0 text-primary fw-bold">Total: ${{ order.total }}</h4>
         </div>
       </div>
@@ -73,3 +102,20 @@ const statusBadge = (status) => ({
   </div>
   <LoadingSpinner v-else />
 </template>
+
+<style scoped>
+.spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-outline-success:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+</style>

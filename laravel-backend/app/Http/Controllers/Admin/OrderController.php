@@ -11,7 +11,16 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('user', 'items.product')->latest()->get();
-        return view('admin.orders.index', compact('orders'));
+
+        $totalOrders   = $orders->count();
+        $pendingCount  = $orders->where('status', 'pending')->count();
+        $completedCount = $orders->where('status', 'completed')->count();
+        $cancelledCount = $orders->where('status', 'cancelled')->count();
+        $totalRevenue  = $orders->where('status', 'completed')->sum('total');
+
+        return view('admin.orders.index', compact(
+            'orders', 'totalOrders', 'pendingCount', 'completedCount', 'cancelledCount', 'totalRevenue'
+        ));
     }
 
     public function show($id)
@@ -25,6 +34,11 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $request->validate(['status' => 'required|in:pending,processing,completed,cancelled']);
         $order->update(['status' => $request->status]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Order status updated']);
+        }
+
         return back()->with('success', 'Order status updated');
     }
 }

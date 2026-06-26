@@ -14,7 +14,7 @@ const loading = ref(false)
 const error = ref('')
 
 const total = computed(() =>
-  items.value.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+  items.value.reduce((sum, item) => sum + ((item.product?.final_price ?? item.product?.price) || 0) * item.quantity, 0)
 )
 
 onMounted(async () => {
@@ -56,8 +56,13 @@ async function placeOrder() {
             <i class="bi bi-receipt me-2"></i>Order Summary
           </h5>
           <div v-for="item in items" :key="item.id" class="d-flex justify-content-between py-2 border-bottom">
-            <span>{{ item.product?.name }} <span class="text-muted">x{{ item.quantity }}</span></span>
-            <span class="fw-semibold">${{ ((item.product?.price || 0) * item.quantity).toFixed(2) }}</span>
+            <span>
+              {{ item.product?.name }} <span class="text-muted">x{{ item.quantity }}</span>
+              <span v-if="item.product?.has_discount" class="badge rounded-pill ms-1" style="background: #fee2e2; color: #dc2626; font-size: 10px;">
+                -{{ item.product?.discount_percent }}%
+              </span>
+            </span>
+            <span class="fw-semibold">${{ (((item.product?.final_price ?? item.product?.price) || 0) * item.quantity).toFixed(2) }}</span>
           </div>
           <p v-if="error" class="text-danger mt-2 small">
             <i class="bi bi-exclamation-circle me-1"></i>{{ error }}

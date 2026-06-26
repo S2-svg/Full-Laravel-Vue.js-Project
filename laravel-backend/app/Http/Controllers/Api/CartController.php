@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -11,6 +12,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $carts = $request->user()->carts()->with('product')->get();
+        $carts->each(fn($cart) => $cart->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
         return response()->json($carts);
     }
 
@@ -21,16 +23,37 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
+        $product = Product::findOrFail($request->product_id);
+
+        if ($product->stock < 1) {
+            return response()->json(['message' => "{$product->name} is out of stock"], 400);
+        }
+
+        // Check existing cart quantity if this product is already in cart
+        $existingCart = Cart::where('user_id', $request->user()->id)
+            ->where('product_id', $request->product_id)
+            ->first();
+
+        $totalQuantity = $request->quantity + ($existingCart ? $existingCart->quantity : 0);
+
+        if ($totalQuantity > $product->stock) {
+            return response()->json([
+                'message' => "Only {$product->stock} of \"{$product->name}\" in stock" .
+                    ($existingCart ? " (you already have {$existingCart->quantity} in your cart)" : ""),
+            ], 400);
+        }
+
         $cart = Cart::updateOrCreate(
             [
                 'user_id' => $request->user()->id,
                 'product_id' => $request->product_id,
             ],
             [
-                'quantity' => $request->quantity,
+                'quantity' => $totalQuantity,
             ]
         );
 
+        $cart->load('product')->product?->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($cart, 201);
     }
 
@@ -40,8 +63,16 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart = $request->user()->carts()->findOrFail($id);
+        $cart = $request->user()->carts()->with('product')->findOrFail($id);
+
+        if ($cart->product && $request->quantity > $cart->product->stock) {
+            return response()->json([
+                'message' => "Only {$cart->product->stock} of \"{$cart->product->name}\" in stock",
+            ], 400);
+        }
+
         $cart->update(['quantity' => $request->quantity]);
+        $cart->product?->setAppends(['final_price', 'has_discount', 'discount_status']);
 
         return response()->json($cart);
     }

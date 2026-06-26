@@ -25,7 +25,7 @@ export function useAuth() {
 
   function handleLogout() {
     auth.logout()
-    router.push('/login')
+    router.push('/')
   }
 
   return { auth, isLoggedIn, isAdmin, requireAuth, handleLogin, handleRegister, handleLogout }

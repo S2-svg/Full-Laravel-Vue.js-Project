@@ -12,7 +12,15 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::withCount('products')->latest()->get();
-        return view('admin.categories.index', compact('categories'));
+
+        $totalCategories = $categories->count();
+        $totalProducts   = $categories->sum('products_count');
+        $hasProducts     = $categories->where('products_count', '>', 0)->count();
+        $emptyCategories = $categories->where('products_count', 0)->count();
+
+        return view('admin.categories.index', compact(
+            'categories', 'totalCategories', 'totalProducts', 'hasProducts', 'emptyCategories'
+        ));
     }
 
     public function create()

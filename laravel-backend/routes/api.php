@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
     Route::post('orders', [App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('orders/{id}', [App\Http\Controllers\Api\OrderController::class, 'show']);
+    Route::post('orders/{id}/reorder', [App\Http\Controllers\Api\OrderController::class, 'reorder']);
 
     // Reviews
     Route::post('reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);

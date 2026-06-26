@@ -280,6 +280,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @yield('scripts')
     <script>
       const notifBadge = document.getElementById('notif-badge');
       const notifList = document.getElementById('notif-list');
@@ -328,10 +329,25 @@
         notifList.innerHTML = notifications.map(n => {
           const isUnread = !n.read_at;
           const time = new Date(n.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-          const detailUrl = n.order_id ? '/admin/orders/' + n.order_id : '#';
+
+          // Determine link and icon based on notification type
+          let icon = 'bi-cart';
+          let iconBg = isUnread ? 'linear-gradient(135deg, #667eea, #764ba2)' : '#f0f2f5';
+          let iconColor = isUnread ? '#fff' : '#6b7280';
+
+          if (n.type === 'low_stock') {
+            icon = 'bi-exclamation-triangle';
+            iconBg = isUnread ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : '#fef3c7';
+            iconColor = isUnread ? '#fff' : '#92400e';
+          }
+
+          let detailUrl = '#';
+          if (n.order_id) detailUrl = '/admin/orders/' + n.order_id;
+          else if (n.product_id) detailUrl = '/admin/products';
+
           return '<a href="' + detailUrl + '" class="notif-item dropdown-item d-flex align-items-start gap-3 px-3 py-3 ' + (isUnread ? 'notif-unread' : '') + '" style="border-bottom: 1px solid #f0f2f5; text-decoration: none; color: inherit;" data-id="' + n.id + '">' +
-            '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: ' + (isUnread ? 'linear-gradient(135deg, #667eea, #764ba2)' : '#f0f2f5') + '; color: ' + (isUnread ? '#fff' : '#6b7280') + '; font-size: 16px;">' +
-              '<i class="bi bi-cart"></i>' +
+            '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: ' + iconBg + '; color: ' + iconColor + '; font-size: 16px;">' +
+              '<i class="bi ' + icon + '"></i>' +
             '</div>' +
             '<div class="flex-grow-1 min-w-0" style="max-width: 240px;">' +
               '<div class="small fw-semibold mb-0" style="font-size: 13px; white-space: normal; line-height: 1.4;">' + n.message + '</div>' +
@@ -365,9 +381,40 @@
         });
       }
 
-      // Polling: check every 10 seconds
+      // ── Real-time EventSource (SSE) ──────────────────────────
+      // Connect to the SSE stream to push new notifications the
+      // instant they are created — no polling delay needed.
+      let notifEventSource = null;
+      // Seed with the current max ID so we don't replay existing notifications
+      let lastNotifId = {{ \App\Models\AdminNotification::max('id') ?? 0 }};
+
+      function connectNotifSSE() {
+        const url = '{{ route("admin.notifications.stream") }}?last_id=' + lastNotifId;
+        notifEventSource = new EventSource(url);
+
+        notifEventSource.addEventListener('notification', function (e) {
+          const notif = JSON.parse(e.data);
+          lastNotifId = Math.max(lastNotifId, notif.id);
+
+          // Pulse the bell badge
+          fetchUnreadCount();
+
+          // If the dropdown is open, refresh the list
+          if (notifDropdownEl && notifDropdownEl.classList.contains('show')) {
+            fetchNotifications();
+          }
+        });
+
+        notifEventSource.onerror = function () {
+          // Close & reconnect manually after a delay to avoid rapid retry storms
+          notifEventSource.close();
+          setTimeout(connectNotifSSE, 3000);
+        };
+      }
+
+      // Initial fetch for badge + connect SSE
       fetchUnreadCount();
-      setInterval(fetchUnreadCount, 10000);
+      connectNotifSSE();
 
       // Refresh notifications list when dropdown opens
       if (notifDropdownEl) {

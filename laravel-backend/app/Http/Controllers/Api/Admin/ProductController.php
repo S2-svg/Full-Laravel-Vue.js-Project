@@ -13,6 +13,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->latest()->get();
+        $products->each->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($products);
     }
 
@@ -45,12 +46,14 @@ class ProductController extends Controller
         }
 
         $product = Product::create($data);
-        return response()->json($product->load('category'), 201);
+        $product = $product->load('category')->setAppends(['final_price', 'has_discount', 'discount_status']);
+        return response()->json($product, 201);
     }
 
     public function show($id)
     {
         $product = Product::with('category')->findOrFail($id);
+        $product->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($product);
     }
 
@@ -85,7 +88,8 @@ class ProductController extends Controller
         }
 
         $product->update($data);
-        return response()->json($product->load('category'));
+        $product = $product->load('category')->setAppends(['final_price', 'has_discount', 'discount_status']);
+        return response()->json($product);
     }
 
     public function destroy($id)

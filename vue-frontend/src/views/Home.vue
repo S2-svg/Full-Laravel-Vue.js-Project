@@ -55,7 +55,7 @@ onMounted(async () => {
     ])
     featuredProducts.value = prodRes.data.data || []
     categories.value = catRes.data
-    reviews.value = revRes.data
+    reviews.value = revRes.data.slice(0, 2)
   } catch (e) {
     console.error(e)
   } finally {
