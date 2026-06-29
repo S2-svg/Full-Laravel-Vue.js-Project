@@ -7,12 +7,14 @@ import StarRating from '../components/StarRating.vue'
 import { useToast } from '../composables/useToast'
 import { useAuth } from '../composables/useAuth'
 import { useCartStore } from '../stores/cart'
+import { useWishlistStore } from '../stores/wishlist'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuth()
 const toast = useToast()
 const cart = useCartStore()
+const wishlist = useWishlistStore()
 
 const product = ref(null)
 const reviews = ref([])
@@ -85,6 +87,7 @@ async function addToWishlist() {
   try {
     await api.post('/wishlists', { product_id: product.value.id })
     toast.success('Added to wishlist!')
+    wishlist.fetchCount()
   } catch (e) {
     toast.error(e.response?.data?.message || 'Error adding to wishlist')
   } finally {
@@ -131,6 +134,7 @@ async function addToCart() {
             :src="`/storage/${product.image}`"
             class="product-image-main"
             alt=""
+            loading="lazy"
           />
           <div
             v-else

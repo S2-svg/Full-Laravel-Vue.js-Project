@@ -12,7 +12,6 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $carts = $request->user()->carts()->with('product')->get();
-        $carts->each(fn($cart) => $cart->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
         return response()->json($carts);
     }
 
@@ -53,7 +52,7 @@ class CartController extends Controller
             ]
         );
 
-        $cart->load('product')->product?->setAppends(['final_price', 'has_discount', 'discount_status']);
+        $cart->load('product');
         return response()->json($cart, 201);
     }
 
@@ -72,7 +71,6 @@ class CartController extends Controller
         }
 
         $cart->update(['quantity' => $request->quantity]);
-        $cart->product?->setAppends(['final_price', 'has_discount', 'discount_status']);
 
         return response()->json($cart);
     }

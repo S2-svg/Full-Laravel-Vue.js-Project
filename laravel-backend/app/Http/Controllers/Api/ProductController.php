@@ -36,7 +36,6 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('category', 'reviews.user')->findOrFail($id);
-        $product->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($product);
     }
 }

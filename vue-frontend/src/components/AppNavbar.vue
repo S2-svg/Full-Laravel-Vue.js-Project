@@ -2,12 +2,15 @@
 import { onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
+import { useWishlistStore } from '../stores/wishlist'
 
 const auth = useAuthStore()
 const cart = useCartStore()
+const wishlist = useWishlistStore()
 
 onMounted(() => {
   cart.fetchCount()
+  wishlist.fetchCount()
 })
 </script>
 
@@ -48,8 +51,11 @@ onMounted(() => {
         <ul class="navbar-nav align-items-lg-center gap-1">
           <template v-if="auth.isLoggedIn">
             <li class="nav-item">
-              <router-link class="nav-link" to="/wishlist">
+              <router-link class="nav-link position-relative" to="/wishlist">
                 <i class="bi bi-heart me-1"></i>Wishlist
+                <span v-if="wishlist.count > 0" class="cart-badge">
+                  {{ wishlist.count > 99 ? '99+' : wishlist.count }}
+                </span>
               </router-link>
             </li>
             <li class="nav-item">
