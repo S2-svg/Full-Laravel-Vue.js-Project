@@ -41,14 +41,13 @@ class ProductController extends Controller
         }
 
         $product = Product::create($data);
-        $product = $product->load('category')->setAppends(['final_price', 'has_discount', 'discount_status']);
+        $product = $product->load('category');
         return response()->json($product, 201);
     }
 
     public function show($id)
     {
         $product = Product::with('category')->findOrFail($id);
-        $product->setAppends(['final_price', 'has_discount', 'discount_status']);
         return response()->json($product);
     }
 
@@ -79,7 +78,7 @@ class ProductController extends Controller
         }
 
         $product->update($data);
-        $product = $product->load('category')->setAppends(['final_price', 'has_discount', 'discount_status']);
+        $product = $product->load('category');
         return response()->json($product);
     }
 

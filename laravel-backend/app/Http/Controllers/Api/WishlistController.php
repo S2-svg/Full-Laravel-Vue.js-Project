@@ -11,7 +11,6 @@ class WishlistController extends Controller
     public function index(Request $request)
     {
         $wishlists = $request->user()->wishlists()->with('product')->get();
-        $wishlists->each(fn($w) => $w->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
         return response()->json($wishlists);
     }
 

@@ -77,8 +77,25 @@ function checkout() {
         <div v-for="(item, idx) in items" :key="item.id" class="p-4 border-bottom" :class="{ 'border-0': idx === items.length - 1 }">
           <div class="row align-items-center g-3">
             <div class="col-md-2">
+<<<<<<< HEAD
               <img v-if="item.product?.image" :src="`/storage/${item.product.image}`" class="img-fluid rounded cart-item-img" loading="lazy" />
               <div v-else class="bg-light text-muted d-flex align-items-center justify-content-center rounded cart-item-img-placeholder"><i class="bi bi-image"></i></div>
+=======
+              <img
+                v-if="item.product?.image"
+                :src="`/storage/${item.product.image}`"
+                class="img-fluid rounded"
+                style="height: 80px; width: 100%; object-fit: cover;"
+                loading="lazy"
+              />
+              <div
+                v-else
+                class="bg-light text-muted d-flex align-items-center justify-content-center rounded"
+                style="height: 80px"
+              >
+                <i class="bi bi-image"></i>
+              </div>
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
             </div>
             <div class="col-md-3">
               <h6 class="mb-1 fw-semibold">{{ item.product?.name }}</h6>

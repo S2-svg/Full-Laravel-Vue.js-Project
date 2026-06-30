@@ -6,12 +6,14 @@ import StarRating from '../components/StarRating.vue'
 import { useToast } from '../composables/useToast'
 import { useAuth } from '../composables/useAuth'
 import { useCartStore } from '../stores/cart'
+import { useWishlistStore } from '../stores/wishlist'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuth()
 const toast = useToast()
 const cart = useCartStore()
+const wishlist = useWishlistStore()
 
 const product = ref(null)
 const reviews = ref([])
@@ -58,6 +60,7 @@ async function addToWishlist() {
   try {
     await api.post('/wishlists', { product_id: product.value.id })
     toast.success('Added to wishlist!')
+    wishlist.fetchCount()
   } catch (e) {
     toast.error(e.response?.data?.message || 'Error adding to wishlist')
   } finally { addingWishlist.value = false }
@@ -92,9 +95,25 @@ async function addToCart() {
 
     <div class="row g-4 mb-5">
       <div class="col-md-6">
+<<<<<<< HEAD
         <div class="product-img-wrapper">
           <img v-if="product?.image" :src="`/storage/${product.image}`" class="product-image-main" alt="" loading="lazy" />
           <div v-else class="product-img-placeholder">
+=======
+        <div class="position-relative rounded overflow-hidden" style="background: #f8fafc;">
+          <img
+            v-if="product.image"
+            :src="`/storage/${product.image}`"
+            class="product-image-main"
+            alt=""
+            loading="lazy"
+          />
+          <div
+            v-else
+            class="bg-light text-muted d-flex align-items-center justify-content-center rounded"
+            style="height: 420px"
+          >
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
             <i class="bi bi-image fs-1"></i>
           </div>
           <button class="wishlist-btn-circle position-absolute top-0 end-0 m-2" :disabled="addingWishlist || !product" @click="addToWishlist" title="Add to wishlist">
