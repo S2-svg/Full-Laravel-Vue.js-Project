@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner.vue'
 import { useToast } from '../composables/useToast'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
+import { getStrengthClass, getStrengthColor, getStrengthLabel } from '../composables/usePasswordStrength'
 
 const toast = useToast()
 const router = useRouter()
@@ -27,8 +28,6 @@ onMounted(async () => {
   try {
     const res = await api.get('/profile')
     profile.value = res.data
-  } catch (e) {
-    console.error(e)
   } finally {
     loading.value = false
   }
@@ -67,33 +66,7 @@ async function changePassword() {
   }
 }
 
-function getPasswordStrength(pw) {
-  let score = 0
-  if (pw.length >= 8) score++
-  if (pw.length >= 12) score++
-  if (/[A-Z]/.test(pw)) score++
-  if (/[0-9]/.test(pw)) score++
-  if (/[^A-Za-z0-9]/.test(pw)) score++
-  return Math.min(score, 4)
-}
 
-function getStrengthClass(bar, pw) {
-  const strength = getPasswordStrength(pw)
-  if (pw.length === 0) return 'strength-empty'
-  return bar <= strength ? `strength-active-${strength}` : 'strength-inactive'
-}
-
-function getStrengthColor(pw) {
-  const strength = getPasswordStrength(pw)
-  const colors = ['', '#f43f5e', '#f59e0b', '#10b981', '#10b981']
-  return colors[strength] || '#94a3b8'
-}
-
-function getStrengthLabel(pw) {
-  const strength = getPasswordStrength(pw)
-  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong']
-  return labels[strength] || ''
-}
 </script>
 
 <template>

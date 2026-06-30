@@ -12,11 +12,10 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->latest()->get();
-
-        $totalProducts   = $products->count();
-        $lowStock        = $products->where('stock', '>', 0)->where('stock', '<=', 5)->count();
-        $outOfStock      = $products->where('stock', 0)->count();
+        $products        = Product::with('category')->latest()->paginate(50);
+        $totalProducts   = Product::count();
+        $lowStock        = Product::where('stock', '>', 0)->where('stock', '<=', 5)->count();
+        $outOfStock      = Product::where('stock', 0)->count();
         $categoriesCount = Category::count();
         $categories      = Category::all();
 

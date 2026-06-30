@@ -22,7 +22,7 @@ onMounted(async () => {
     const res = await api.get('/carts')
     items.value = res.data
     if (items.value.length === 0) router.push('/cart')
-  } catch (e) { console.error(e) }
+  } catch (e) { /* ignore */ }
 })
 
 async function placeOrder() {

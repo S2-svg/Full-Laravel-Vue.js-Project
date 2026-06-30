@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 
 const auth = useAuthStore()
 const cart = useCartStore()
-
+const showNav = ref(false)
 onMounted(() => {
   cart.fetchCount()
 })
@@ -24,21 +24,20 @@ onMounted(() => {
       <button
         class="navbar-toggler border-0"
         type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
+        @click="showNav = !showNav"
         aria-label="Toggle navigation"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="navbar-collapse" :class="{ show: showNav }" id="navbarNav">
         <ul class="navbar-nav me-auto gap-1">
-          <li class="nav-item">
+          <li class="nav-item" @click="showNav = false">
             <router-link class="nav-link" to="/">
               <i class="bi bi-house me-1"></i>Home
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" @click="showNav = false">
             <router-link class="nav-link" to="/products">
               <i class="bi bi-grid me-1"></i>Products
             </router-link>
@@ -47,12 +46,12 @@ onMounted(() => {
 
         <ul class="navbar-nav align-items-lg-center gap-1">
           <template v-if="auth.isLoggedIn">
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link" to="/wishlist">
                 <i class="bi bi-heart me-1"></i>Wishlist
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link position-relative" to="/cart">
                 <i class="bi bi-cart3 me-1"></i>Cart
                 <span v-if="cart.count > 0" class="cart-badge">
@@ -60,24 +59,24 @@ onMounted(() => {
                 </span>
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link" to="/orders">
                 <i class="bi bi-box me-1"></i>Orders
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link" to="/profile">
                 <i class="bi bi-person me-1"></i>Profile
               </router-link>
             </li>
           </template>
           <template v-else>
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link" to="/login">
                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" @click="showNav = false">
               <router-link class="nav-link nav-register" to="/register">
                 <i class="bi bi-person-plus me-1"></i>Register
               </router-link>

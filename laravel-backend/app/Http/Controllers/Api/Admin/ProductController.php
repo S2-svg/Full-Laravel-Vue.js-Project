@@ -12,17 +12,12 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->latest()->get();
-        $products->each->setAppends(['final_price', 'has_discount', 'discount_status']);
+        $products = Product::with('category')->latest()->paginate(50);
         return response()->json($products);
     }
 
     public function store(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
@@ -59,10 +54,6 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        if ($request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $product = Product::findOrFail($id);
 
         $request->validate([
@@ -94,10 +85,6 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        if (request()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $product = Product::findOrFail($id);
         $product->delete();
         return response()->json(['message' => 'Product deleted']);
