@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,12 +14,11 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::withCount('products')->latest()->get();
-
-        $totalCategories = $categories->count();
-        $totalProducts   = $categories->sum('products_count');
-        $hasProducts     = $categories->where('products_count', '>', 0)->count();
-        $emptyCategories = $categories->where('products_count', 0)->count();
+        $categories      = Category::withCount('products')->latest()->paginate(50);
+        $totalCategories = Category::count();
+        $totalProducts   = Product::count();
+        $hasProducts     = Category::whereHas('products')->count();
+        $emptyCategories = $totalCategories - $hasProducts;
 
         return view('admin.categories.index', compact(
             'categories', 'totalCategories', 'totalProducts', 'hasProducts', 'emptyCategories'

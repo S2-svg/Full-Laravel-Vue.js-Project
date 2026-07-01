@@ -412,40 +412,40 @@
         });
       }
 
-      // ── Real-time EventSource (SSE) ──────────────────────────
-      // Connect to the SSE stream to push new notifications the
-      // instant they are created — no polling delay needed.
-      let notifEventSource = null;
-      // Seed with the current max ID so we don't replay existing notifications
+      // ── Polling-based notifications ──────────────────────────
+      // Uses short polling instead of SSE (Server-Sent Events) because
+      // PHP's built-in dev server is single-threaded and SSE blocks all
+      // other requests. Polling every 15s is fast, safe, and reliable.
       let lastNotifId = {{ \App\Models\AdminNotification::max('id') ?? 0 }};
 
-      function connectNotifSSE() {
-        const url = '{{ route("admin.notifications.stream") }}?last_id=' + lastNotifId;
-        notifEventSource = new EventSource(url);
+      async function pollNotifications() {
+        try {
+          const res = await fetch('{{ route("admin.notifications.index") }}?since_id=' + lastNotifId);
+          const notifications = await res.json();
+          if (notifications && notifications.length > 0) {
+            // Update badge
+            fetchUnreadCount();
 
-        notifEventSource.addEventListener('notification', function (e) {
-          const notif = JSON.parse(e.data);
-          lastNotifId = Math.max(lastNotifId, notif.id);
+            // Update last known ID
+            for (const n of notifications) {
+              if (n.id > lastNotifId) lastNotifId = n.id;
+            }
 
-          // Pulse the bell badge
-          fetchUnreadCount();
-
-          // If the dropdown is open, refresh the list
-          if (notifDropdownEl && notifDropdownEl.classList.contains('show')) {
-            fetchNotifications();
+            // If the dropdown is open, refresh the list
+            if (notifDropdownEl && notifDropdownEl.classList.contains('show')) {
+              fetchNotifications();
+            }
           }
-        });
-
-        notifEventSource.onerror = function () {
-          // Close & reconnect manually after a delay to avoid rapid retry storms
-          notifEventSource.close();
-          setTimeout(connectNotifSSE, 3000);
-        };
+        } catch (e) {
+          // Silently retry on next poll
+        }
       }
 
-      // Initial fetch for badge + connect SSE
+      // Initial fetch for badge
       fetchUnreadCount();
-      connectNotifSSE();
+
+      // Poll every 15 seconds for new notifications
+      setInterval(pollNotifications, 15000);
 
       // Refresh notifications list when dropdown opens
       if (notifDropdownEl) {

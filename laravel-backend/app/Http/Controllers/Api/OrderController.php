@@ -18,7 +18,6 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $orders = $request->user()->orders()->with('items.product')->latest()->get();
-        $orders->each(fn($o) => $o->items->each(fn($i) => $i->product?->setAppends(['final_price', 'has_discount', 'discount_status'])));
         return response()->json($orders);
     }
 
@@ -132,7 +131,6 @@ class OrderController extends Controller
             });
 
             $order = Order::with('items.product')->find($order->id);
-            $order?->items->each(fn($i) => $i->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
             return response()->json($order, 201);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -142,7 +140,6 @@ class OrderController extends Controller
     public function show(Request $request, $id)
     {
         $order = $request->user()->orders()->with('items.product')->findOrFail($id);
-        $order->items->each(fn($item) => $item->product?->setAppends(['final_price', 'has_discount', 'discount_status']));
         return response()->json($order);
     }
 

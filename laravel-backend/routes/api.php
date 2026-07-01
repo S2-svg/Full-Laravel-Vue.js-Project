@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 // Public APIs
 Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
 Route::get('categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'show']);
-Route::get('products/search', [App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('products', [App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('products/{id}', [App\Http\Controllers\Api\ProductController::class, 'show']);
 Route::get('products/{id}/reviews', [App\Http\Controllers\Api\ReviewController::class, 'index']);
@@ -46,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
 
     // Admin
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware('admin.api')->group(function () {
         Route::get('stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
         Route::apiResource('categories', App\Http\Controllers\Api\Admin\CategoryController::class);
         Route::apiResource('products', App\Http\Controllers\Api\Admin\ProductController::class);

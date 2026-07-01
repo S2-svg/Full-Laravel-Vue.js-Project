@@ -5,8 +5,10 @@ import ProductCard from '../components/ProductCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import { useToast } from '../composables/useToast'
+import { useWishlistStore } from '../stores/wishlist'
 
 const toast = useToast()
+const wishlist = useWishlistStore()
 const items = ref([])
 const loading = ref(true)
 
@@ -14,8 +16,6 @@ onMounted(async () => {
   try {
     const res = await api.get('/wishlists')
     items.value = res.data
-  } catch (e) {
-    console.error(e)
   } finally {
     loading.value = false
   }
@@ -25,6 +25,7 @@ async function remove(id) {
   try {
     await api.delete(`/wishlists/${id}`)
     items.value = items.value.filter(i => i.id !== id)
+    wishlist.decrement()
     toast.success('Removed from wishlist')
   } catch (e) {
     toast.error('Error removing item')

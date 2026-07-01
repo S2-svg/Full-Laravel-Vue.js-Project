@@ -5,14 +5,21 @@ let nextId = 0
 
 export const useToastStore = defineStore('toast', () => {
   const toasts = ref([])
+  const timers = new Map()
 
   function add(message, type = 'info', duration = 4000) {
     const id = ++nextId
     toasts.value.push({ id, message, type })
-    setTimeout(() => remove(id), duration)
+    const timer = setTimeout(() => remove(id), duration)
+    timers.set(id, timer)
   }
 
   function remove(id) {
+    const timer = timers.get(id)
+    if (timer) {
+      clearTimeout(timer)
+      timers.delete(id)
+    }
     toasts.value = toasts.value.filter(t => t.id !== id)
   }
 

@@ -5,6 +5,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -32,14 +33,17 @@ class ProductController extends Controller
 
         $perPage = $request->per_page ?? 12;
         $products = $query->paginate($perPage);
-        return response()->json($products);
+        return ProductResource::collection($products);
     }
 
     public function show($id)
     {
         $product = Product::with('category', 'reviews.user')->findOrFail($id);
-        $product->setAppends(['final_price', 'has_discount', 'discount_status']);
+<<<<<<< HEAD
+        return new ProductResource($product);
+=======
         return response()->json($product);
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
     }
 }
 >>>>>>> 270228540f02abaf2f4f0faeff3c16802c8a4e67

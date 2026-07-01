@@ -15,12 +15,16 @@ class NotificationController extends Controller
         return response()->json(['count' => $count]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = AdminNotification::with('order', 'product')
-            ->latest()
-            ->limit(20)
-            ->get();
+        $query = AdminNotification::with('order', 'product')->latest();
+
+        // Support since_id for polling — only fetch notifications newer than this ID
+        if ($request->filled('since_id')) {
+            $query->where('id', '>', (int) $request->since_id);
+        }
+
+        $notifications = $query->limit(20)->get();
         return response()->json($notifications);
     }
 

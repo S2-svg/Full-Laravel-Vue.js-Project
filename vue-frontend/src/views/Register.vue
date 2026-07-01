@@ -4,6 +4,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { usePasswordStrength } from '../composables/usePasswordStrength'
 
 const router = useRouter()
 const auth = useAuth()
@@ -12,6 +13,8 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const loading = ref(false)
 const errors = ref({})
+
+const { strengthColor, strengthLabel, getStrengthClass } = usePasswordStrength(computed(() => form.value.password))
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -26,29 +29,6 @@ const isValidForm = computed(() =>
   form.value.password_confirmation &&
   form.value.password === form.value.password_confirmation
 )
-
-// ── Password strength ──
-function getPasswordStrength(pw) {
-  if (!pw) return 0
-  let score = 0
-  if (pw.length >= 8) score++
-  if (pw.length >= 12) score++
-  if (/[A-Z]/.test(pw)) score++
-  if (/[0-9]/.test(pw)) score++
-  if (/[^A-Za-z0-9]/.test(pw)) score++
-  return Math.min(score, 4)
-}
-
-const strength = computed(() => getPasswordStrength(form.value.password))
-const strengthColors = ['', '#f43f5e', '#f59e0b', '#10b981', '#10b981']
-const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong']
-const strengthColor = computed(() => strengthColors[strength.value] || '#94a3b8')
-const strengthLabel = computed(() => strengthLabels[strength.value] || '')
-
-function getStrengthClass(bar) {
-  if (!form.value.password) return 'strength-empty'
-  return bar <= strength.value ? `strength-active-${strength.value}` : 'strength-inactive'
-}
 
 // ── Validation ──
 function validate() {
