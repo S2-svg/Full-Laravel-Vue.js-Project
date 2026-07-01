@@ -9,10 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            // Index for discount date queries (ProcessDiscounts command, discount_status accessor)
-            $table->index('discount_start_at');
-            $table->index('discount_end_at');
-
             // Composite index for the most common discount query pattern
             // WHERE discount_percent > 0 AND discount_end_at IS NOT NULL AND discount_end_at <= now
             $table->index(['discount_percent', 'discount_end_at']);
@@ -58,8 +54,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropIndex(['discount_start_at']);
-            $table->dropIndex(['discount_end_at']);
             $table->dropIndex(['discount_percent', 'discount_end_at']);
             $table->dropIndex(['stock']);
             $table->dropIndex(['category_id']);
