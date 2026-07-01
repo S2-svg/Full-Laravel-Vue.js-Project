@@ -153,4 +153,5 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 3. **Categories CRUD**: Create → List → Get → Update → Delete
 4. **Products CRUD**: Create → List → Get → Update → Delete
 5. **Orders**: List all → Get details → Update status (e.g. pending → processing → completed)
-6. **Users**: List all users
+6. **Users**: List all users# E-Commerce-System-Backend
+# E-Commerce-System-Backend

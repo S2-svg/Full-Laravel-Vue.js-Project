@@ -42,7 +42,7 @@ class ProductController extends Controller
             'discount_start_at' => 'nullable|date',
             'discount_end_at' => 'nullable|date|after_or_equal:discount_start_at',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = [
@@ -85,7 +85,7 @@ class ProductController extends Controller
             'discount_start_at' => 'nullable|date',
             'discount_end_at' => 'nullable|date|after_or_equal:discount_start_at',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = [
