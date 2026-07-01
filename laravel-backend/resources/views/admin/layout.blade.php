@@ -184,12 +184,103 @@
         border-radius: 12px;
         padding: 16px 20px;
       }
+      /* ─── Mobile Responsive ─── */
+      .sidebar {
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        z-index: 1040;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1035;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+      }
+      .sidebar-overlay.active {
+        display: block;
+      }
+      .sidebar-toggle-btn {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        border-radius: 10px;
+        color: #6b7280;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .sidebar-toggle-btn:hover {
+        background: rgba(102,126,234,0.08);
+        color: #667eea;
+      }
+      @media (max-width: 991.98px) {
+        body.admin-mobile-open { overflow: hidden; }
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          min-height: 100vh;
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-toggle-btn {
+          display: inline-flex;
+        }
+        .topbar {
+          padding: 12px 16px !important;
+        }
+        .topbar h5 {
+          font-size: 16px;
+        }
+        .content-area {
+          padding: 20px 16px !important;
+        }
+        .d-flex.mb-4:first-of-type {
+          flex-direction: column;
+          align-items: flex-start !important;
+          gap: 12px;
+        }
+        .d-flex.mb-4:first-of-type .btn {
+          width: 100%;
+        }
+        .card-header .d-flex.gap-2 {
+          flex-direction: column;
+          width: 100%;
+        }
+        .card-header .d-flex.gap-2 select,
+        .card-header .d-flex.gap-2 .input-group {
+          width: 100% !important;
+          min-width: 0 !important;
+        }
+        .card-header .d-flex.gap-2 .input-group {
+          max-width: none;
+        }
+        .table-modern thead th,
+        .table-modern tbody td {
+          white-space: nowrap;
+        }
+        .main-content {
+          min-width: 0;
+          width: 100%;
+        }
+      }
     </style>
 </head>
 <body>
-    <div class="d-flex">
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="d-flex position-relative">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="adminSidebar">
             <div class="sidebar-brand">
                 <h5 class="mb-0">Store Admin</h5>
                 <small>Management Panel</small>
@@ -243,7 +334,12 @@
         <!-- Main -->
         <div class="main-content">
             <div class="topbar">
-                <h5>@yield('page-title', 'Dashboard')</h5>
+                <div class="d-flex align-items-center gap-2">
+                  <button class="sidebar-toggle-btn" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                  </button>
+                  <h5>@yield('page-title', 'Dashboard')</h5>
+                </div>
                 <div class="topbar-right">
                     <div class="dropdown" id="notif-dropdown">
                       <span class="badge-notif dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notif-bell" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; transition: all 0.2s;">
@@ -253,7 +349,7 @@
                         </span>
                         <span class="notif-ring" style="position: absolute; inset: -4px; border-radius: 16px; border: 2px solid rgba(102,126,234,0.2); pointer-events: none;"></span>
                       </span>
-                      <div class="dropdown-menu dropdown-menu-end" style="width: 380px; max-height: 480px; overflow-y: auto; border-radius: 16px; border: none; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06); background: #ffffff;" id="notif-menu">
+                      <div class="dropdown-menu dropdown-menu-end" style="width: 380px; max-width: calc(100vw - 32px); max-height: 480px; overflow-y: auto; border-radius: 16px; border: none; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06); background: #ffffff;" id="notif-menu">
                         <!-- Header -->
                         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 18px 20px; position: sticky; top: 0; z-index: 2;">
                           <div class="d-flex align-items-center justify-content-between">
@@ -546,6 +642,36 @@
         }
       `;
       document.head.appendChild(styleSheet);
+
+      // ── Sidebar Toggle (Mobile) ──────────────────────────
+      function toggleSidebar() {
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const body = document.body;
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        body.classList.toggle('admin-mobile-open');
+      }
+
+      document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+        toggleSidebar();
+      });
+
+      // Close sidebar on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('adminSidebar')?.classList.contains('open')) {
+          toggleSidebar();
+        }
+      });
+
+      // Close sidebar when clicking a nav link on mobile
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+          if (window.innerWidth < 992) {
+            toggleSidebar();
+          }
+        });
+      });
     </script>
 </body>
 </html>
