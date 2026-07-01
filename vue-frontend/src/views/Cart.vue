@@ -118,14 +118,13 @@ function checkout() {
               <img
                 v-if="item.product?.image"
                 :src="`/storage/${item.product.image}`"
-                class="img-fluid rounded"
-                style="height: 80px; width: 100%; object-fit: cover;"
+                class="cart-item-image"
+                :alt="item.product.name"
                 loading="lazy"
               />
               <div
                 v-else
-                class="bg-light text-muted d-flex align-items-center justify-content-center rounded"
-                style="height: 80px"
+                class="cart-item-image-placeholder"
               >
                 <i class="bi bi-image"></i>
               </div>

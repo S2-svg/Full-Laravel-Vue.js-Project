@@ -43,5 +43,6 @@ Route::prefix('admin')->group(function () {
         Route::get('notifications/stream', [App\Http\Controllers\Admin\NotificationController::class, 'stream'])->name('admin.notifications.stream');
         Route::post('notifications/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
         Route::post('notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('admin.notifications.read-all');
+        Route::delete('notifications/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
     });
 });

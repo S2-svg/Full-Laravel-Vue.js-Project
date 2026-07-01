@@ -128,24 +128,23 @@ async function addToCart() {
 
     <div class="row g-4 mb-5">
       <div class="col-md-6">
-        <div class="position-relative rounded overflow-hidden" style="background: #f8fafc;">
+        <div class="product-image-wrapper">
           <img
             v-if="product.image"
             :src="`/storage/${product.image}`"
             class="product-image-main"
-            alt=""
+            :alt="product.name"
             loading="lazy"
           />
           <div
             v-else
-            class="bg-light text-muted d-flex align-items-center justify-content-center rounded"
-            style="height: 420px"
+            class="product-image-main d-flex align-items-center justify-content-center"
+            style="padding: 0;"
           >
-            <i class="bi bi-image fs-1"></i>
+            <i class="bi bi-image" style="font-size: 3rem; opacity: 0.4;"></i>
           </div>
           <button
-            class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 rounded-circle"
-            style="width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
+            class="btn btn-sm wishlist-btn-overlay position-absolute top-0 end-0 m-2 rounded-circle d-inline-flex align-items-center justify-content-center"
             :disabled="addingWishlist"
             @click="addToWishlist"
             title="Add to wishlist"

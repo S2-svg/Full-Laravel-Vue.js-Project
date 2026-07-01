@@ -25,6 +25,11 @@ class AdminNotification extends Model
         return $query->whereNull('read_at');
     }
 
+    public function scopeRead($query)
+    {
+        return $query->whereNotNull('read_at');
+    }
+
     public function scopeOfType($query, string $type)
     {
         return $query->where('type', $type);

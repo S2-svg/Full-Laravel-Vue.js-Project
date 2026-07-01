@@ -54,6 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('orders/{id}', [App\Http\Controllers\Api\Admin\OrderController::class, 'show']);
         Route::put('orders/{id}/status', [App\Http\Controllers\Api\Admin\OrderController::class, 'updateStatus']);
         Route::get('users', [App\Http\Controllers\Api\Admin\UserController::class, 'index']);
-
+        Route::delete('notifications/{id}', [App\Http\Controllers\Api\Admin\NotificationController::class, 'destroy']);
     });
 });

@@ -41,6 +41,13 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function destroy($id)
+    {
+        $notification = AdminNotification::findOrFail($id);
+        $notification->delete();
+        return response()->json(['success' => true]);
+    }
+
     /**
      * Stream new notifications via Server-Sent Events.
      * The client connects via EventSource, the server polls the

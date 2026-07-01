@@ -11,20 +11,19 @@ const showPrice = computed(() => props.product.final_price ?? props.product.pric
 
 <template>
   <div class="card h-100 product-card border-0 shadow-sm" :class="{ 'product-out-of-stock': isOutOfStock }">
-    <router-link :to="`/products/${product.id}`" class="position-relative">
+    <router-link :to="`/products/${product.id}`" class="card-img-wrapper d-block">
       <img
         v-if="product.image"
         :src="`/storage/${product.image}`"
         class="card-img-top"
-        alt=""
+        :alt="product.name"
         loading="lazy"
       />
       <div
         v-else
-        class="card-img-top bg-light text-muted d-flex align-items-center justify-content-center"
-        style="height: 200px"
+        class="card-img-placeholder"
       >
-        <i class="bi bi-image fs-1"></i>
+        <i class="bi bi-image"></i>
       </div>
 
       <!-- Discount Badge -->
