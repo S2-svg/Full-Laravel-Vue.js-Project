@@ -52,82 +52,84 @@ function checkout() {
 </script>
 
 <template>
-  <div class="section-header">
-    <span class="header-icon"><i class="bi bi-cart3"></i></span>
-    <h2>Shopping Cart</h2>
-    <span class="header-line"></span>
-  </div>
+  <div class="cart-page">
+    <div class="section-header">
+      <span class="header-icon"><i class="bi bi-cart3"></i></span>
+      <h2>Shopping Cart</h2>
+      <span class="header-line"></span>
+    </div>
 
-  <EmptyState v-if="ready && items.length === 0" icon="bi-cart-x" title="Your cart is empty" message="Looks like you haven't added anything yet." linkTo="/products" linkText="Start Shopping" />
-  <div v-else-if="items.length === 0" class="text-center py-4 text-muted">
-    <i class="bi bi-cart3 fs-1 d-block mb-2"></i>
-    <p>Loading your cart...</p>
-  </div>
-  <div v-else>
-    <div v-if="stockIssueItems.length > 0" class="alert alert-danger d-flex align-items-center gap-2 mb-3 stock-alert">
-      <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-      <span><strong>Out of stock:</strong> <span v-for="(item, i) in stockIssueItems" :key="item.id">{{ item.product?.name }}<span v-if="i < stockIssueItems.length - 1">, </span></span> — please remove these items to proceed.</span>
+    <EmptyState v-if="ready && items.length === 0" icon="bi-cart-x" title="Your cart is empty" message="Looks like you haven't added anything yet." linkTo="/products" linkText="Start Shopping" />
+    <div v-else-if="items.length === 0" class="text-center py-4 text-muted">
+      <i class="bi bi-cart3 fs-1 d-block mb-2"></i>
+      <p>Loading your cart...</p>
     </div>
-    <div v-if="lowStockItems.length > 0" class="alert alert-warning d-flex align-items-center gap-2 mb-3 stock-alert">
-      <i class="bi bi-exclamation-circle-fill fs-5"></i>
-      <span><strong>Low stock:</strong> <span v-for="(item, i) in lowStockItems" :key="item.id">{{ item.product?.name }} ({{ item.product?.stock }} left)<span v-if="i < lowStockItems.length - 1">, </span></span> — quantities may be limited at checkout.</span>
-    </div>
-    <div class="card border-0 shadow-sm mb-3">
-      <div class="card-body p-0">
-        <div v-for="(item, idx) in items" :key="item.id" class="p-4 border-bottom" :class="{ 'border-0': idx === items.length - 1 }">
-          <div class="row align-items-center g-3">
-            <div class="col-md-2">
-              <img
-                v-if="item.product?.image"
-                :src="`/storage/${item.product.image}`"
-                class="cart-item-image"
-                :alt="item.product.name"
-                loading="lazy"
-              />
-              <div
-                v-else
-                class="cart-item-image-placeholder"
-              >
-                <i class="bi bi-image"></i>
+    <div v-else>
+      <div v-if="stockIssueItems.length > 0" class="alert alert-danger d-flex align-items-center gap-2 mb-3 stock-alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span><strong>Out of stock:</strong> <span v-for="(item, i) in stockIssueItems" :key="item.id">{{ item.product?.name }}<span v-if="i < stockIssueItems.length - 1">, </span></span> — please remove these items to proceed.</span>
+      </div>
+      <div v-if="lowStockItems.length > 0" class="alert alert-warning d-flex align-items-center gap-2 mb-3 stock-alert">
+        <i class="bi bi-exclamation-circle-fill fs-5"></i>
+        <span><strong>Low stock:</strong> <span v-for="(item, i) in lowStockItems" :key="item.id">{{ item.product?.name }} ({{ item.product?.stock }} left)<span v-if="i < lowStockItems.length - 1">, </span></span> — quantities may be limited at checkout.</span>
+      </div>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-0">
+          <div v-for="(item, idx) in items" :key="item.id" class="p-4 border-bottom" :class="{ 'border-0': idx === items.length - 1 }">
+            <div class="row align-items-center g-3">
+              <div class="col-md-2">
+                <img
+                  v-if="item.product?.image"
+                  :src="`/storage/${item.product.image}`"
+                  class="cart-item-image"
+                  :alt="item.product.name"
+                  loading="lazy"
+                />
+                <div
+                  v-else
+                  class="cart-item-image-placeholder"
+                >
+                  <i class="bi bi-image"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-md-3">
-              <h6 class="mb-1 fw-semibold">{{ item.product?.name }}</h6>
-              <div class="d-flex align-items-center gap-2">
-                <p class="text-muted small mb-0">${{ item.product?.final_price ?? item.product?.price }} each</p>
-                <span v-if="item.product?.has_discount" class="small text-muted text-decoration-line-through">${{ item.product?.price }}</span>
-                <span v-if="item.product?.has_discount" class="badge rounded-pill cart-discount-badge">-{{ item.product?.discount_percent }}%</span>
+              <div class="col-md-3">
+                <h6 class="mb-1 fw-semibold">{{ item.product?.name }}</h6>
+                <div class="d-flex align-items-center gap-2">
+                  <p class="text-muted small mb-0">${{ item.product?.final_price ?? item.product?.price }} each</p>
+                  <span v-if="item.product?.has_discount" class="small text-muted text-decoration-line-through">${{ item.product?.price }}</span>
+                  <span v-if="item.product?.has_discount" class="badge rounded-pill cart-discount-badge">-{{ item.product?.discount_percent }}%</span>
+                </div>
+                <span v-if="item.product && item.product.stock <= 0" class="badge rounded-pill mt-1 stock-badge-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                <span v-else-if="item.product && item.product.stock <= 5" class="badge rounded-pill mt-1 stock-badge-low"><i class="bi bi-exclamation-circle me-1"></i>Only {{ item.product.stock }} left</span>
               </div>
-              <span v-if="item.product && item.product.stock <= 0" class="badge rounded-pill mt-1 stock-badge-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
-              <span v-else-if="item.product && item.product.stock <= 5" class="badge rounded-pill mt-1 stock-badge-low"><i class="bi bi-exclamation-circle me-1"></i>Only {{ item.product.stock }} left</span>
-            </div>
-            <div class="col-md-3">
-              <div class="d-flex align-items-center gap-2">
-                <button class="qty-btn" :disabled="item.product?.stock <= 0" @click="updateQty(item, item.quantity - 1)"><i class="bi bi-dash"></i></button>
-                <span class="qty-display" :class="{ 'text-danger': item.product?.stock <= 0 }">{{ item.quantity }}</span>
-                <button class="qty-btn" :disabled="item.product?.stock <= 0" @click="updateQty(item, item.quantity + 1)"><i class="bi bi-plus"></i></button>
+              <div class="col-md-3">
+                <div class="d-flex align-items-center gap-2">
+                  <button class="qty-btn" :disabled="item.product?.stock <= 0" @click="updateQty(item, item.quantity - 1)"><i class="bi bi-dash"></i></button>
+                  <span class="qty-display" :class="{ 'text-danger': item.product?.stock <= 0 }">{{ item.quantity }}</span>
+                  <button class="qty-btn" :disabled="item.product?.stock <= 0" @click="updateQty(item, item.quantity + 1)"><i class="bi bi-plus"></i></button>
+                </div>
               </div>
-            </div>
-            <div class="col-md-2">
-              <strong class="fw-bold" :class="item.product?.stock <= 0 ? 'text-danger' : 'text-primary'">${{ (((item.product?.final_price ?? item.product?.price) || 0) * item.quantity).toFixed(2) }}</strong>
-            </div>
-            <div class="col-md-2 text-end">
-              <button class="btn btn-sm btn-outline-danger" @click="remove(item.id)"><i class="bi bi-trash me-1"></i>Remove</button>
+              <div class="col-md-2">
+                <strong class="fw-bold" :class="item.product?.stock <= 0 ? 'text-danger' : 'text-primary'">${{ (((item.product?.final_price ?? item.product?.price) || 0) * item.quantity).toFixed(2) }}</strong>
+              </div>
+              <div class="col-md-2 text-end">
+                <button class="btn btn-sm btn-outline-danger" @click="remove(item.id)"><i class="bi bi-trash me-1"></i>Remove</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="card border-0 shadow-sm p-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <span class="text-muted small">Total ({{ items.length }} item{{ items.length > 1 ? 's' : '' }})</span>
-          <h3 class="mb-0 text-primary fw-bold">${{ total.toFixed(2) }}</h3>
+      <div class="card border-0 shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small">Total ({{ items.length }} item{{ items.length > 1 ? 's' : '' }})</span>
+            <h3 class="mb-0 text-primary fw-bold">${{ total.toFixed(2) }}</h3>
+          </div>
+          <button class="btn btn-lg px-5" :class="hasStockIssues ? 'btn-secondary' : 'btn-primary'" :disabled="hasStockIssues" @click="checkout">
+            <i class="bi bi-credit-card me-2"></i>
+            {{ hasStockIssues ? 'Remove out of stock items' : 'Proceed to Checkout' }}
+          </button>
         </div>
-        <button class="btn btn-lg px-5" :class="hasStockIssues ? 'btn-secondary' : 'btn-primary'" :disabled="hasStockIssues" @click="checkout">
-          <i class="bi bi-credit-card me-2"></i>
-          {{ hasStockIssues ? 'Remove out of stock items' : 'Proceed to Checkout' }}
-        </button>
       </div>
     </div>
   </div>

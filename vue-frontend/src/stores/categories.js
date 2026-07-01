@@ -19,5 +19,10 @@ export const useCategoriesStore = defineStore('categories', () => {
     loaded.value = true
   }
 
-  return { items, loaded, fetch, set }
+  function reset() {
+    items.value = []
+    loaded.value = false
+  }
+
+  return { items, loaded, fetch, set, reset }
 })

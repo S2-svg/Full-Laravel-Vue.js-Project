@@ -26,6 +26,9 @@ return new class extends Migration
 
             // Index for ordering by latest
             $table->index('created_at');
+
+            // Index for filtering by status
+            $table->index('status');
         });
 
         Schema::table('order_items', function (Blueprint $table) {
@@ -47,6 +50,10 @@ return new class extends Migration
         Schema::table('admin_notifications', function (Blueprint $table) {
             // Index for the unread scope and type+product_id deduplication
             $table->index(['type', 'product_id']);
+
+            // Index for the unread scope query (WHERE type = X AND read_at IS NULL)
+            $table->index(['type', 'read_at']);
+
             $table->index('read_at');
         });
     }
@@ -62,6 +69,7 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             $table->dropIndex(['user_id']);
             $table->dropIndex(['created_at']);
+            $table->dropIndex(['status']);
         });
 
         Schema::table('order_items', function (Blueprint $table) {
@@ -81,6 +89,7 @@ return new class extends Migration
 
         Schema::table('admin_notifications', function (Blueprint $table) {
             $table->dropIndex(['type', 'product_id']);
+            $table->dropIndex(['type', 'read_at']);
             $table->dropIndex(['read_at']);
         });
     }

@@ -1,12 +1,22 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './components/AppNavbar.vue'
 import AppFooter from './components/AppFooter.vue'
 import ToastNotification from './components/ToastNotification.vue'
+import { useCategoriesStore } from './stores/categories'
+import { clearCache } from './composables/useApiCache'
 
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+
+// Clear stale caches when navigating between pages so data refreshes automatically
+watch(() => route.path, () => {
+  clearCache()
+  if (!isAdminRoute.value) {
+    useCategoriesStore().reset()
+  }
+})
 </script>
 
 <template>

@@ -34,34 +34,36 @@ async function remove(id) {
 </script>
 
 <template>
-  <div class="section-header">
-    <span class="header-icon"><i class="bi bi-heart"></i></span>
-    <h2>My Wishlist</h2>
-    <span class="header-line"></span>
-  </div>
+  <div class="wishlist-page">
+    <div class="section-header">
+      <span class="header-icon"><i class="bi bi-heart"></i></span>
+      <h2>My Wishlist</h2>
+      <span class="header-line"></span>
+    </div>
 
-  <LoadingSpinner v-if="loading" />
-  <EmptyState
-    v-else-if="items.length === 0"
-    icon="bi-heartbreak"
-    title="Your wishlist is empty"
-    message="Save items you love to your wishlist."
-    linkTo="/products"
-    linkText="Browse Products"
-  />
-  <div v-else class="row">
-    <div v-for="item in items" :key="item.id" class="col-6 col-md-3 mb-4">
-      <div class="card h-100 product-card border-0 shadow-sm">
-        <div class="position-relative">
-          <ProductCard :product="item.product" />
-          <button
-            class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
-            style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
-            @click="remove(item.id)"
-            title="Remove"
-          >
-            <i class="bi bi-x"></i>
-          </button>
+    <LoadingSpinner v-if="loading" />
+    <EmptyState
+      v-else-if="items.length === 0"
+      icon="bi-heartbreak"
+      title="Your wishlist is empty"
+      message="Save items you love to your wishlist."
+      linkTo="/products"
+      linkText="Browse Products"
+    />
+    <div v-else class="row">
+      <div v-for="item in items" :key="item.id" class="col-6 col-md-3 mb-4">
+        <div class="card h-100 product-card border-0 shadow-sm">
+          <div class="position-relative">
+            <ProductCard :product="item.product" />
+            <button
+              class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
+              style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
+              @click="remove(item.id)"
+              title="Remove"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

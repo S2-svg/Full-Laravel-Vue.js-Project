@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 import { useWishlistStore } from '../stores/wishlist'
@@ -8,6 +8,17 @@ const auth = useAuthStore()
 const cart = useCartStore()
 const showNav = ref(false)
 const wishlist = useWishlistStore()
+
+// Re-fetch cart/wishlist counts whenever auth state changes (login/logout)
+watch(() => auth.isLoggedIn, (loggedIn) => {
+  if (loggedIn) {
+    cart.fetchCount()
+    wishlist.fetchCount()
+  } else {
+    cart.reset()
+    wishlist.reset()
+  }
+})
 
 onMounted(() => {
   cart.fetchCount()
