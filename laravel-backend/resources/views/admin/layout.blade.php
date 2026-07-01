@@ -223,6 +223,11 @@
                     </li>
                     <li class="nav-divider"></li>
                     <li class="nav-item">
+                        <a href="{{ route('admin.tax.index') }}" class="nav-link {{ request()->routeIs('admin.tax.*') ? 'active' : '' }}">
+                            <i class="bi bi-file-earmark-bar-graph me-2"></i>Tax Report
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('admin.logout') }}" class="nav-link text-danger"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="bi bi-box-arrow-left me-2 text-danger"></i> <span class="text-danger">Logout</span>

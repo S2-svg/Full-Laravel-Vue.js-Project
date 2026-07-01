@@ -11,6 +11,14 @@ class OrderItem extends Model
         'product_id',
         'quantity',
         'price',
+        'original_price',
+        'vat_amount',
+    ];
+
+    protected $casts = [
+        'price' => 'float',
+        'original_price' => 'float',
+        'vat_amount' => 'float',
     ];
 
     public function order()

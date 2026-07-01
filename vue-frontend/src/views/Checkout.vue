@@ -5,10 +5,12 @@ import api from '../api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import { useToast } from '../composables/useToast'
 import { useCartStore } from '../stores/cart'
+import { useOrderStore } from '../stores/orders'
 
 const router = useRouter()
 const toast = useToast()
 const cartStore = useCartStore()
+const orderStore = useOrderStore()
 const items = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -31,6 +33,7 @@ async function placeOrder() {
   try {
     const res = await api.post('/orders')
     cartStore.reset()
+    orderStore.increment()
     toast.success('Order placed successfully!')
     router.push(`/orders/${res.data.id}`)
   } catch (e) {

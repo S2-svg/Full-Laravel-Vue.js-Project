@@ -11,7 +11,17 @@ class Order extends Model
         'order_number',
         'status',
         'total',
+        'vat_total',
     ];
+
+    protected $appends = [
+        'grand_total',
+    ];
+
+    public function getGrandTotalAttribute(): float
+    {
+        return (float) $this->total + (float) $this->vat_total;
+    }
 
     public function user()
     {

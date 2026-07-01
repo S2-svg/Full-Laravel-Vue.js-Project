@@ -87,30 +87,45 @@ class OrderController extends Controller
                     }
                 }
 
-                $total = collect($carts)->sum(function ($cart) use ($lockedProducts) {
+                $vatRate = 0.10; // 10% VAT
+                $total = 0;
+                $vatTotal = 0;
+                $orderItemsData = [];
+
+                foreach ($carts as $cart) {
                     $product = $lockedProducts->get($cart->product_id);
-                    return $product->final_price * $cart->quantity;
-                });
+                    $originalPrice = (float) $product->price;
+                    $finalPrice = (float) $product->final_price;
+                    $quantity = (int) $cart->quantity;
+
+                    $lineTotal = $finalPrice * $quantity;
+                    $lineVat = round($originalPrice * $quantity * $vatRate, 2);
+
+                    $total += $lineTotal;
+                    $vatTotal += $lineVat;
+
+                    $orderItemsData[] = [
+                        'product_id' => $cart->product_id,
+                        'quantity' => $quantity,
+                        'price' => $finalPrice,
+                        'original_price' => $originalPrice,
+                        'vat_amount' => $lineVat,
+                    ];
+                }
 
                 $order = Order::create([
                     'user_id' => $request->user()->id,
                     'order_number' => 'ORD-' . Str::random(10),
                     'status' => 'pending',
                     'total' => $total,
+                    'vat_total' => $vatTotal,
                 ]);
 
-                foreach ($carts as $cart) {
-                    $product = $lockedProducts->get($cart->product_id);
+                foreach ($orderItemsData as $itemData) {
+                    OrderItem::create(array_merge($itemData, ['order_id' => $order->id]));
 
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $cart->product_id,
-                        'quantity' => $cart->quantity,
-                        'price' => $product->final_price,
-                    ]);
-
-                    // Decrement stock (safe within the lock)
-                    $product->decrement('stock', $cart->quantity);
+                    $product = $lockedProducts->get($itemData['product_id']);
+                    $product->decrement('stock', $itemData['quantity']);
                 }
 
                 // Check for low-stock products and notify admin

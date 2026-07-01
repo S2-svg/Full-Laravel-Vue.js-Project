@@ -109,7 +109,7 @@
                             <th style="width: 130px;">Category</th>
                             <th style="width: 120px;">Price</th>
                             <th style="width: 100px;">Stock</th>
-                            <th style="width: 160px;">Actions</th>
+                            <th style="width: 185px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,7 +138,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="fw-semibold" style="font-size: 14px; color: #1e1e2f;">{{ $product->name }}</div>
+                                    <a href="{{ route('admin.products.show', $product) }}" class="fw-semibold text-decoration-none" style="font-size: 14px; color: #1e1e2f;">{{ $product->name }}</a>
                                     @if($product->description)
                                         <div class="text-muted" style="font-size: 11px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             {{ Str::limit($product->description, 60) }}
@@ -180,6 +180,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1 align-items-center">
+                                        <a href="{{ route('admin.products.show', $product) }}" class="btn btn-sm btn-outline-secondary border-0" title="View Details" style="border-radius: 8px; padding: 6px 12px; color: #10b981;">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-secondary border-0" title="Edit Product" style="border-radius: 8px; padding: 6px 12px; color: #667eea;">
                                             <i class="bi bi-pencil"></i>
                                         </a>

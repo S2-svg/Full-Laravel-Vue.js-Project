@@ -27,6 +27,7 @@ Route::prefix('admin')->group(function () {
         Route::get('products', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.products.index');
         Route::get('products/create', [App\Http\Controllers\Admin\ProductController::class, 'create'])->name('admin.products.create');
         Route::post('products', [App\Http\Controllers\Admin\ProductController::class, 'store'])->name('admin.products.store');
+        Route::get('products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
         Route::get('products/{id}/edit', [App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('admin.products.edit');
         Route::put('products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
@@ -36,6 +37,11 @@ Route::prefix('admin')->group(function () {
         Route::put('orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.update');
 
         Route::get('users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+
+        // Tax Reports — VAT Declaration for Ministry of Economy and Finance
+        Route::get('tax', [App\Http\Controllers\Admin\TaxReportController::class, 'index'])->name('admin.tax.index');
+        Route::get('tax/export-pdf', [App\Http\Controllers\Admin\TaxReportController::class, 'exportPdf'])->name('admin.tax.export-pdf');
+        Route::get('tax/export-csv', [App\Http\Controllers\Admin\TaxReportController::class, 'exportCsv'])->name('admin.tax.export-csv');
 
         // Notifications
         Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('admin.notifications.unread-count');

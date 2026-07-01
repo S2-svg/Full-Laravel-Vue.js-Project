@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('profile', [App\Http\Controllers\Api\ProfileController::class, 'show']);
     Route::put('profile', [App\Http\Controllers\Api\ProfileController::class, 'update']);
+    Route::post('profile/avatar', [App\Http\Controllers\Api\ProfileController::class, 'updateAvatar']);
+    Route::delete('profile/avatar', [App\Http\Controllers\Api\ProfileController::class, 'deleteAvatar']);
     Route::put('change-password', [App\Http\Controllers\Api\ProfileController::class, 'changePassword']);
 
     // Wishlist

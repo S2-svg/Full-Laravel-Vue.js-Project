@@ -64,6 +64,12 @@ class ProductController extends Controller
         return redirect('/admin/products')->with('success', 'Product created');
     }
 
+    public function show($id)
+    {
+        $product = Product::with(['category', 'reviews.user', 'orderItems.order.user'])->findOrFail($id);
+        return view('admin.products.show', compact('product'));
+    }
+
     public function edit($id)
     {
         $product = Product::findOrFail($id);

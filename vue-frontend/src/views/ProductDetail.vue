@@ -28,10 +28,19 @@ const hoverRating = ref(0)
 const canSubmit = computed(() => reviewForm.value.rating > 0 && reviewForm.value.comment.trim().length > 0)
 
 onMounted(async () => {
-  Promise.all([
-    api.get(`/products/${route.params.id}`).then(r => { product.value = r.data; productReady.value = true }),
-    api.get(`/products/${route.params.id}/reviews`).then(r => { reviews.value = r.data }),
-  ])
+  try {
+    const [productRes, reviewsRes] = await Promise.all([
+      api.get(`/products/${route.params.id}`),
+      api.get(`/products/${route.params.id}/reviews`),
+    ])
+    // API resource wraps response in 'data' key; reviews returns plain array
+    product.value = productRes.data.data
+    reviews.value = reviewsRes.data
+    productReady.value = true
+  } catch (e) {
+    toast.error('Failed to load product details')
+    console.error('Product detail load error:', e)
+  }
 })
 
 function setRating(val) { reviewForm.value.rating = val }
@@ -40,7 +49,7 @@ function clearHover() { hoverRating.value = 0 }
 
 async function submitReview() {
   if (!auth.isLoggedIn) return router.push('/login')
-  if (!canSubmit.value) return
+  if (!canSubmit.value || !product.value) return
   submittingReview.value = true
   reviewError.value = ''
   try {
@@ -56,6 +65,10 @@ async function submitReview() {
 
 async function addToWishlist() {
   if (!auth.isLoggedIn) return router.push('/login')
+  if (!product.value) {
+    toast.error('Product data not loaded yet')
+    return
+  }
   addingWishlist.value = true
   try {
     await api.post('/wishlists', { product_id: product.value.id })
@@ -74,8 +87,8 @@ async function addToCart() {
   addingCart.value = true
   try {
     await api.post('/carts', { product_id: product.value.id, quantity: 1 })
-    toast.success('Added to cart!')
     cart.fetchCount()
+    router.push('/cart')
   } catch (e) {
     toast.error(e.response?.data?.message || 'Error adding to cart')
   } finally { addingCart.value = false }
@@ -93,14 +106,23 @@ async function addToCart() {
       </ol>
     </nav>
 
+    <!-- Loading spinner while product loads -->
+    <div v-if="!product" class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted">Loading product details...</p>
+    </div>
+
+    <template v-if="product">
     <div class="row g-4 mb-5">
       <div class="col-md-6">
         <div class="product-image-wrapper">
           <img
-            v-if="product.image"
+            v-if="product?.image"
             :src="`/storage/${product.image}`"
             class="product-image-main"
-            :alt="product.name"
+            :alt="product?.name || 'Product'"
             loading="lazy"
           />
           <div
@@ -229,6 +251,7 @@ async function addToCart() {
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 

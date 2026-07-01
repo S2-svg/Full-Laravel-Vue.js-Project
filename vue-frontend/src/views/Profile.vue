@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '../api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import { useToast } from '../composables/useToast'
@@ -23,6 +23,15 @@ const showConfirm = ref(false)
 const profileLoading = ref(false)
 const passLoading = ref(false)
 const loading = ref(true)
+const avatarUploading = ref(false)
+const avatarPreview = ref(null)
+const fileInput = ref(null)
+
+const avatarSrc = computed(() => {
+  if (avatarPreview.value) return avatarPreview.value
+  if (profile.value?.avatar_url) return profile.value.avatar_url
+  return null
+})
 
 onMounted(async () => {
   try {
@@ -36,6 +45,60 @@ onMounted(async () => {
 async function handleLogout() {
   auth.logout()
   router.push('/')
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function onFileSelected(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  // Preview locally
+  const reader = new FileReader()
+  reader.onload = (ev) => {
+    avatarPreview.value = ev.target.result
+  }
+  reader.readAsDataURL(file)
+
+  // Upload immediately
+  uploadAvatar(file)
+}
+
+async function uploadAvatar(file) {
+  avatarUploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('avatar', file)
+    const res = await api.post('/profile/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    profile.value = res.data
+    avatarPreview.value = null
+    auth.user = res.data
+    localStorage.setItem('user', JSON.stringify(res.data))
+    toast.success('Avatar updated!')
+  } catch (e) {
+    avatarPreview.value = null
+    toast.error(e.response?.data?.message || 'Error uploading avatar')
+  } finally {
+    avatarUploading.value = false
+    if (fileInput.value) fileInput.value.value = ''
+  }
+}
+
+async function removeAvatar() {
+  if (!confirm('Remove your profile picture?')) return
+  try {
+    const res = await api.delete('/profile/avatar')
+    profile.value = res.data
+    auth.user = res.data
+    localStorage.setItem('user', JSON.stringify(res.data))
+    toast.success('Avatar removed')
+  } catch (e) {
+    toast.error('Error removing avatar')
+  }
 }
 
 async function updateProfile() {
@@ -80,6 +143,42 @@ async function changePassword() {
       </div>
 
       <div class="row g-4">
+        <!-- Avatar Card -->
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-4">
+                <!-- Avatar preview -->
+                <div class="position-relative" style="flex-shrink: 0;">
+                  <div class="avatar-circle">
+                    <img v-if="avatarSrc" :src="avatarSrc" class="avatar-img" alt="Avatar" />
+                    <div v-else class="avatar-placeholder">
+                      <i class="bi bi-person"></i>
+                    </div>
+                    <div v-if="avatarUploading" class="avatar-spinner-overlay">
+                      <div class="spinner-border spinner-border-sm text-white"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-grow-1">
+                  <h6 class="fw-bold mb-1">Profile Picture</h6>
+                  <p class="text-muted small mb-3">JPG, PNG, GIF or WebP. Max 2MB.</p>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" @click="triggerFileInput" :disabled="avatarUploading">
+                      <i class="bi bi-upload me-1"></i>{{ avatarSrc ? 'Change' : 'Upload' }}
+                    </button>
+                    <button v-if="avatarSrc" class="btn btn-outline-danger btn-sm" @click="removeAvatar" :disabled="avatarUploading">
+                      <i class="bi bi-trash me-1"></i>Remove
+                    </button>
+                    <input ref="fileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="d-none" @change="onFileSelected" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-md-6">
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
@@ -245,6 +344,44 @@ async function changePassword() {
 </template>
 
 <style scoped>
+.avatar-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 40px;
+  opacity: 0.8;
+}
+
+.avatar-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .login-wrapper {
   max-width: 440px;
   margin: 3rem auto;

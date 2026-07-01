@@ -20,7 +20,20 @@ class User extends Authenticatable
         'role',
         'phone',
         'address',
+        'avatar',
     ];
+
+    protected $appends = [
+        'avatar_url',
+    ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar) {
+            return null;
+        }
+        return asset('storage/' . $this->avatar);
+    }
 
     protected $hidden = [
         'password',
