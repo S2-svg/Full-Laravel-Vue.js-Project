@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-=======
->>>>>>> 15befe42a6d9c0eab14c68956c67a6b274a6d8cb
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 :root {
   --color-bg: #f5f7fb;
   --color-surface: #ffffff;
@@ -1026,4 +1021,3 @@ a:hover {
 .list-group-item:last-child {
   border-bottom: none;
 }
->>>>>>> 270228540f02abaf2f4f0faeff3c16802c8a4e67
