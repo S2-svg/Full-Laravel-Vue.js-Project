@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -19,8 +18,6 @@ class Product extends Model
         'stock',
         'image',
     ];
-
-    protected $appends = ['final_price', 'has_discount', 'discount_status'];
 
     protected $casts = [
         'discount_percent' => 'integer',
@@ -50,7 +47,8 @@ class Product extends Model
             return $this->cachedDiscountState = 'none';
         }
 
-        $now = Carbon::now();
+        $now = now();
+
 
         if ($this->discount_end_at && $now->gt($this->discount_end_at)) {
             return $this->cachedDiscountState = 'expired';
@@ -71,9 +69,6 @@ class Product extends Model
         return $this->computeDiscountState() === 'active';
     }
 
-    /**
-     * Get the final price after discount (only applies if discount is active).
-     */
     public function getFinalPriceAttribute(): float
     {
         if ($this->computeDiscountState() !== 'active') {
@@ -83,17 +78,11 @@ class Product extends Model
         return round($this->price * (1 - $this->discount_percent / 100), 2);
     }
 
-    /**
-     * Whether the product has an active discount (visible to customers).
-     */
     public function getHasDiscountAttribute(): bool
     {
         return $this->computeDiscountState() === 'active';
     }
 
-    /**
-     * Human-readable discount status: 'active', 'scheduled', 'expired', or 'none'.
-     */
     public function getDiscountStatusAttribute(): string
     {
         return $this->computeDiscountState();

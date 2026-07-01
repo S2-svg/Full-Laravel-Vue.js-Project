@@ -9,11 +9,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        if (request()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $users = User::withCount('orders')->latest()->get();
+        $users = User::withCount('orders')->latest()->paginate(50);
         return response()->json($users);
     }
 }
