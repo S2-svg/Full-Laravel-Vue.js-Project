@@ -10,30 +10,25 @@ class OrderController extends Controller
 {
     public function index()
     {
+<<<<<<< HEAD
+=======
         if (request()->user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
         $orders = Order::with('user', 'items.product')->latest()->paginate(50);
         return response()->json($orders);
     }
 
     public function show($id)
     {
-        if (request()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $order = Order::with('user', 'items.product')->findOrFail($id);
         return response()->json($order);
     }
 
     public function updateStatus(Request $request, $id)
     {
-        if ($request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $order = Order::findOrFail($id);
         $request->validate(['status' => 'required|in:pending,processing,completed,cancelled']);
         $order->update(['status' => $request->status]);

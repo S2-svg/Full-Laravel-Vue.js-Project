@@ -21,29 +21,25 @@ const showPrice = computed(() => props.product.final_price ?? props.product.pric
       />
       <div
         v-else
-        class="card-img-top bg-light text-muted d-flex align-items-center justify-content-center"
-        style="height: 200px"
+        class="card-img-top bg-light text-muted d-flex align-items-center justify-content-center card-img-placeholder"
       >
         <i class="bi bi-image fs-1"></i>
       </div>
 
-      <!-- Discount Badge -->
       <div
         v-if="product.has_discount && !isOutOfStock"
         class="position-absolute top-0 start-0 m-2"
       >
-        <span class="badge rounded-pill px-2 py-1" style="background: #ef4444; font-size: 12px; font-weight: 700;">
+        <span class="badge rounded-pill px-2 py-1 card-discount-badge">
           -{{ product.discount_percent }}%
         </span>
       </div>
 
-      <!-- Out of Stock Overlay -->
       <div
         v-if="isOutOfStock"
-        class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center"
-        style="background: rgba(255,255,255,0.7); backdrop-filter: blur(2px);"
+        class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center stock-overlay"
       >
-        <span class="badge rounded-pill px-3 py-2" style="background: #ef4444; font-size: 13px; font-weight: 600;">
+        <span class="badge rounded-pill px-3 py-2 stock-badge">
           <i class="bi bi-x-circle me-1"></i>Out of Stock
         </span>
       </div>
@@ -68,3 +64,26 @@ const showPrice = computed(() => props.product.final_price ?? props.product.pric
     </div>
   </div>
 </template>
+
+<style scoped>
+.card-img-placeholder {
+  height: 200px;
+}
+
+.card-discount-badge {
+  background: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stock-overlay {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(2px);
+}
+
+.stock-badge {
+  background: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+}
+</style>

@@ -12,11 +12,6 @@ class DashboardController extends Controller
 {
     public function stats()
     {
-        $user = request()->user();
-        if ($user->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         return response()->json([
             'users' => User::count(),
             'products' => Product::count(),

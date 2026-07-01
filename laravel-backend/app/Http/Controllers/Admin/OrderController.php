@@ -10,13 +10,12 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with('user', 'items.product')->latest()->get();
-
-        $totalOrders   = $orders->count();
-        $pendingCount  = $orders->where('status', 'pending')->count();
-        $completedCount = $orders->where('status', 'completed')->count();
-        $cancelledCount = $orders->where('status', 'cancelled')->count();
-        $totalRevenue  = $orders->where('status', 'completed')->sum('total');
+        $orders         = Order::with('user', 'items.product')->latest()->paginate(50);
+        $totalOrders    = Order::count();
+        $pendingCount   = Order::where('status', 'pending')->count();
+        $completedCount = Order::where('status', 'completed')->count();
+        $cancelledCount = Order::where('status', 'cancelled')->count();
+        $totalRevenue   = Order::where('status', 'completed')->sum('total');
 
         return view('admin.orders.index', compact(
             'orders', 'totalOrders', 'pendingCount', 'completedCount', 'cancelledCount', 'totalRevenue'

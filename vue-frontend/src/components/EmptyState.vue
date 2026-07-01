@@ -10,7 +10,7 @@ defineProps({
 
 <template>
   <div class="text-center py-5">
-    <i class="bi {{ icon }} fs-1 text-muted mb-3 d-block"></i>
+    <i :class="'bi ' + icon + ' fs-1 text-muted mb-3 d-block'"></i>
     <h5 class="text-muted">{{ title }}</h5>
     <p v-if="message" class="text-muted">{{ message }}</p>
     <router-link v-if="linkTo" :to="linkTo" class="btn btn-primary mt-2">

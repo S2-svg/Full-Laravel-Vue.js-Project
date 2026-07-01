@@ -2,13 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api'
-import LoadingSpinner from '../components/LoadingSpinner.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { useToast } from '../composables/useToast'
 import { useCartStore } from '../stores/cart'
 
 const orders = ref([])
-const loading = ref(true)
+const ready = ref(false)
 const reordering = ref(null)
 
 const router = useRouter()
@@ -19,11 +18,7 @@ onMounted(async () => {
   try {
     const res = await api.get('/orders')
     orders.value = res.data
-  } catch (e) {
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
+  } finally { ready.value = true }
 })
 
 const statusBadge = (status) => ({
@@ -41,9 +36,7 @@ async function reorder(orderId) {
     router.push('/cart')
   } catch (e) {
     toast.error(e.response?.data?.message || 'Failed to reorder')
-  } finally {
-    reordering.value = null
-  }
+  } finally { reordering.value = null }
 }
 </script>
 
@@ -54,64 +47,36 @@ async function reorder(orderId) {
     <span class="header-line"></span>
   </div>
 
-  <LoadingSpinner v-if="loading" />
-  <EmptyState
-    v-else-if="orders.length === 0"
-    icon="bi-box"
-    title="No orders yet"
-    message="You haven't placed any orders yet."
-    linkTo="/products"
-    linkText="Start Shopping"
-  />
+  <EmptyState v-if="ready && orders.length === 0" icon="bi-box" title="No orders yet" message="You haven't placed any orders yet." linkTo="/products" linkText="Start Shopping" />
+  <div v-else-if="!ready" class="text-center py-4 text-muted">
+    <i class="bi bi-box fs-1 d-block mb-2"></i>
+    <p>Loading orders...</p>
+  </div>
   <div v-else>
     <div v-for="order in orders" :key="order.id" class="card border-0 shadow-sm mb-3">
       <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <span class="fw-semibold">
-          <i class="bi bi-receipt me-1"></i>Order #{{ order.order_number }}
-        </span>
+        <span class="fw-semibold"><i class="bi bi-receipt me-1"></i>Order #{{ order.order_number }}</span>
         <span class="badge rounded-pill" :class="statusBadge(order.status)">{{ order.status }}</span>
       </div>
       <div class="card-body">
-        <p class="text-muted small mb-3">
-          <i class="bi bi-calendar me-1"></i>Placed: {{ new Date(order.created_at).toLocaleDateString() }}
-        </p>
+        <p class="text-muted small mb-3"><i class="bi bi-calendar me-1"></i>Placed: {{ new Date(order.created_at).toLocaleDateString() }}</p>
         <div class="table-responsive">
           <table class="table table-sm mb-3">
             <thead class="table-light">
-              <tr>
-                <th>Product</th>
-                <th>Qty</th>
-                <th class="text-end">Price</th>
-                <th class="text-end">Subtotal</th>
-              </tr>
+              <tr><th>Product</th><th>Qty</th><th class="text-end">Price</th><th class="text-end">Subtotal</th></tr>
             </thead>
             <tbody>
               <tr v-for="item in order.items" :key="item.id">
-                <td>{{ item.product?.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td class="text-end">${{ item.price }}</td>
-                <td class="text-end">${{ (item.price * item.quantity).toFixed(2) }}</td>
+                <td>{{ item.product?.name }}</td><td>{{ item.quantity }}</td><td class="text-end">${{ item.price }}</td><td class="text-end">${{ (item.price * item.quantity).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="d-flex justify-content-between align-items-center pt-2 border-top">
           <div class="d-flex gap-2">
-            <router-link
-              :to="`/orders/${order.id}`"
-              class="btn btn-outline-primary"
-            >
-              <i class="bi bi-eye me-1"></i>View Details
-            </router-link>
-            <button
-              class="btn btn-outline-success"
-              :disabled="reordering === order.id"
-              @click="reorder(order.id)"
-            >
-              <i
-                :class="reordering === order.id ? 'bi-arrow-repeat spinner' : 'bi-arrow-counterclockwise'"
-                class="me-1"
-              ></i>
+            <router-link :to="`/orders/${order.id}`" class="btn btn-outline-primary"><i class="bi bi-eye me-1"></i>View Details</router-link>
+            <button class="btn btn-outline-success" :disabled="reordering === order.id" @click="reorder(order.id)">
+              <i :class="reordering === order.id ? 'bi-arrow-repeat spinner' : 'bi-arrow-counterclockwise'" class="me-1"></i>
               {{ reordering === order.id ? 'Adding...' : 'Reorder' }}
             </button>
           </div>
@@ -123,18 +88,7 @@ async function reorder(orderId) {
 </template>
 
 <style scoped>
-.spinner {
-  animation: spin 1s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.btn-outline-success:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+.spinner { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.btn-outline-success:disabled { opacity: 0.7; cursor: not-allowed; }
 </style>

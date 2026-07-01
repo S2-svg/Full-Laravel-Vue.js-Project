@@ -18,10 +18,31 @@ const isAdminRoute = computed(() => route.path.startsWith('/admin'))
     <div class="d-flex flex-column min-vh-100">
       <Navbar />
       <main class="container py-4 flex-grow-1">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <transition name="page" mode="out-in">
+            <component :is="Component" :key="route.path" />
+          </transition>
+        </router-view>
       </main>
       <AppFooter />
       <ToastNotification />
     </div>
   </template>
 </template>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>

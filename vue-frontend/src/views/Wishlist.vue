@@ -16,8 +16,6 @@ onMounted(async () => {
   try {
     const res = await api.get('/wishlists')
     items.value = res.data
-  } catch (e) {
-    console.error(e)
   } finally {
     loading.value = false
   }

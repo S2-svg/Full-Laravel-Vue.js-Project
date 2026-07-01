@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -20,8 +19,6 @@ class Product extends Model
         'image',
     ];
 
-    protected $appends = ['final_price', 'has_discount', 'discount_status'];
-
     protected $casts = [
         'discount_percent' => 'integer',
         'discount_start_at' => 'datetime',
@@ -29,6 +26,9 @@ class Product extends Model
         'price' => 'float',
     ];
 
+<<<<<<< HEAD
+    public function getIsDiscountActiveAttribute(): bool
+=======
     /**
      * Cached discount state to avoid re-computing Carbon::now() multiple times
      * per model instance (called by final_price, has_discount, discount_status).
@@ -41,6 +41,7 @@ class Product extends Model
      * Compute the discount state once and cache it on the instance.
      */
     protected function computeDiscountState(): string
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
     {
         if ($this->cachedDiscountState !== null) {
             return $this->cachedDiscountState;
@@ -50,8 +51,15 @@ class Product extends Model
             return $this->cachedDiscountState = 'none';
         }
 
-        $now = Carbon::now();
+        $now = now();
 
+<<<<<<< HEAD
+        if ($this->discount_start_at && $now->lt($this->discount_start_at)) {
+            return false;
+        }
+
+=======
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
         if ($this->discount_end_at && $now->gt($this->discount_end_at)) {
             return $this->cachedDiscountState = 'expired';
         }
@@ -71,9 +79,6 @@ class Product extends Model
         return $this->computeDiscountState() === 'active';
     }
 
-    /**
-     * Get the final price after discount (only applies if discount is active).
-     */
     public function getFinalPriceAttribute(): float
     {
         if ($this->computeDiscountState() !== 'active') {
@@ -83,28 +88,36 @@ class Product extends Model
         return round($this->price * (1 - $this->discount_percent / 100), 2);
     }
 
-    /**
-     * Whether the product has an active discount (visible to customers).
-     */
     public function getHasDiscountAttribute(): bool
     {
         return $this->computeDiscountState() === 'active';
     }
 
-    /**
-     * Human-readable discount status: 'active', 'scheduled', 'expired', or 'none'.
-     */
     public function getDiscountStatusAttribute(): string
     {
         return $this->computeDiscountState();
     }
 
+<<<<<<< HEAD
+        $now = now();
+
+        if ($this->discount_end_at && $now->gt($this->discount_end_at)) {
+            return 'expired';
+        }
+
+        if ($this->discount_start_at && $now->lt($this->discount_start_at)) {
+            return 'scheduled';
+        }
+
+        return 'active';
+=======
     /**
      * Reset the cached discount state (useful if the model's discount fields are modified after loading).
      */
     public function resetDiscountState(): void
     {
         $this->cachedDiscountState = null;
+>>>>>>> 31c469c6f899e95dac5485e91348bfb77f86852c
     }
 
     public function category()
