@@ -35,4 +35,11 @@ class NotificationController extends Controller
         AdminNotification::unread()->update(['read_at' => now()]);
         return response()->json(['success' => true]);
     }
+
+    public function destroy($id)
+    {
+        $notification = AdminNotification::findOrFail($id);
+        $notification->delete();
+        return response()->json(['success' => true]);
+    }
 }

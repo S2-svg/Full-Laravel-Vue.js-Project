@@ -54,6 +54,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('orders/{id}', [App\Http\Controllers\Api\Admin\OrderController::class, 'show']);
         Route::put('orders/{id}/status', [App\Http\Controllers\Api\Admin\OrderController::class, 'updateStatus']);
         Route::get('users', [App\Http\Controllers\Api\Admin\UserController::class, 'index']);
-
+        Route::delete('notifications/{id}', [App\Http\Controllers\Api\Admin\NotificationController::class, 'destroy']);
+        Route::get('notifications/unread-count', [App\Http\Controllers\Api\Admin\NotificationController::class, 'unreadCount']);
+        Route::get('notifications', [App\Http\Controllers\Api\Admin\NotificationController::class, 'index']);
+        Route::post('notifications/{id}/read', [App\Http\Controllers\Api\Admin\NotificationController::class, 'markAsRead']);
+        Route::post('notifications/read-all', [App\Http\Controllers\Api\Admin\NotificationController::class, 'markAllAsRead']);
     });
 });

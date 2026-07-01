@@ -345,24 +345,55 @@
           if (n.order_id) detailUrl = '/admin/orders/' + n.order_id;
           else if (n.product_id) detailUrl = '/admin/products';
 
-          return '<a href="' + detailUrl + '" class="notif-item dropdown-item d-flex align-items-start gap-3 px-3 py-3 ' + (isUnread ? 'notif-unread' : '') + '" style="border-bottom: 1px solid #f0f2f5; text-decoration: none; color: inherit;" data-id="' + n.id + '">' +
-            '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: ' + iconBg + '; color: ' + iconColor + '; font-size: 16px;">' +
-              '<i class="bi ' + icon + '"></i>' +
-            '</div>' +
-            '<div class="flex-grow-1 min-w-0" style="max-width: 240px;">' +
-              '<div class="small fw-semibold mb-0" style="font-size: 13px; white-space: normal; line-height: 1.4;">' + n.message + '</div>' +
-              '<div class="text-muted" style="font-size: 11px; margin-top: 2px;">' + time + '</div>' +
-            '</div>' +
-            (isUnread ? '<span class="rounded-circle flex-shrink-0" style="width: 8px; height: 8px; background: #667eea; margin-top: 6px;"></span>' : '') +
-          '</a>';
+          return '<div class="notif-item d-flex align-items-start gap-3 px-3 py-3 position-relative ' + (isUnread ? 'notif-unread' : '') + '" data-id="' + n.id + '" style="border-bottom: 1px solid #f0f2f5;">' +
+            '<a href="' + detailUrl + '" class="d-flex align-items-start gap-3 text-decoration-none text-reset flex-grow-1 min-w-0" style="color: inherit;">' +
+              '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: ' + iconBg + '; color: ' + iconColor + '; font-size: 16px;">' +
+                '<i class="bi ' + icon + '"></i>' +
+              '</div>' +
+              '<div class="flex-grow-1 min-w-0" style="max-width: 210px;">' +
+                '<div class="small fw-semibold mb-0" style="font-size: 13px; white-space: normal; line-height: 1.4;">' + n.message + '</div>' +
+                '<div class="text-muted" style="font-size: 11px; margin-top: 2px;">' + time + '</div>' +
+              '</div>' +
+              (isUnread ? '<span class="rounded-circle flex-shrink-0" style="width: 8px; height: 8px; background: #667eea; margin-top: 6px;"></span>' : '') +
+            '</a>' +
+            '<button class="btn notif-delete-btn p-0 border-0 d-flex align-items-center justify-content-center flex-shrink-0" data-id="' + n.id + '" title="Delete notification" style="width: 24px; height: 24px; border-radius: 6px; background: transparent; color: #9ca3af; cursor: pointer; transition: all 0.15s;">' +
+              '<i class="bi bi-x" style="font-size: 14px; font-weight: 700;"></i>' +
+            '</button>' +
+          '</div>';
         }).join('');
 
-        // Click handler to mark as read
-        document.querySelectorAll('.notif-item').forEach(el => {
+        // Click handler to mark as read (only on the link portion)
+        document.querySelectorAll('.notif-item a').forEach(el => {
           el.addEventListener('click', function(e) {
-            const id = this.dataset.id;
+            const id = this.closest('.notif-item').dataset.id;
             if (id) {
               fetch('/admin/notifications/' + id + '/read', { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken } }).catch(() => {});
+            }
+          });
+        });
+
+        // Delete notification handler
+        document.querySelectorAll('.notif-delete-btn').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.dataset.id;
+            const item = this.closest('.notif-item');
+            if (id && item) {
+              // Brief visual fade before removing
+              item.style.transition = 'all 0.2s ease';
+              item.style.opacity = '0';
+              item.style.transform = 'translateX(-10px)';
+              fetch('/admin/notifications/' + id, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken } })
+                .then(() => {
+                  fetchNotifications();
+                  fetchUnreadCount();
+                })
+                .catch(e => {
+                  // Revert on error
+                  item.style.opacity = '1';
+                  item.style.transform = 'none';
+                  console.error('Delete error:', e);
+                });
             }
           });
         });
@@ -439,6 +470,19 @@
         }
         .notif-item:last-child {
           border-bottom: none !important;
+        }
+        .notif-item:hover .notif-delete-btn {
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+        .notif-delete-btn {
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.15s;
+        }
+        .notif-delete-btn:hover {
+          background: #fee2e2 !important;
+          color: #ef4444 !important;
         }
         .badge-notif.dropdown-toggle::after {
           display: none !important;
