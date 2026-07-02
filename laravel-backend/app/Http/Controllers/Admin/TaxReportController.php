@@ -28,11 +28,11 @@ class TaxReportController extends Controller
         $endDate   = date('Y-m-t', strtotime($startDate));
 
         $orders = Order::with(['items', 'user'])
+            ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
             ->orderBy('created_at')
             ->get();
 
-        // If no orders with vat_total exist, calculate from order_items for backward compatibility
         $summary = $this->calculateSummary($orders, $startDate, $endDate);
 
         $months = [];
@@ -59,6 +59,7 @@ class TaxReportController extends Controller
         $endDate   = date('Y-m-t', strtotime($startDate));
 
         $orders = Order::with(['items', 'user'])
+            ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
             ->orderBy('created_at')
             ->get();
@@ -86,6 +87,7 @@ class TaxReportController extends Controller
         $endDate   = date('Y-m-t', strtotime($startDate));
 
         $orders = Order::with(['items', 'user'])
+            ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
             ->orderBy('created_at')
             ->get();

@@ -66,7 +66,7 @@ onMounted(() => {
       </router-link>
 
       <button
-        class="navbar-toggler border-0"
+        class="navbar-toggler border-0 d-lg-none"
         :class="{ 'toggler-open': showNav }"
         type="button"
         @click="toggleNav"
@@ -292,6 +292,18 @@ onMounted(() => {
   .navbar-nav .nav-register {
     text-align: center;
     margin-top: 4px;
+  }
+}
+
+/* Desktop: always show navbar links */
+@media (min-width: 992px) {
+  .navbar-collapse {
+    display: flex !important;
+  }
+
+  .nav-slide-enter-active,
+  .nav-slide-leave-active {
+    animation: none;
   }
 }
 </style>

@@ -41,6 +41,7 @@ class GenerateMonthlyVatReport extends Command
 
         // ── Fetch orders ──
         $orders = Order::with(['items', 'user'])
+            ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
             ->orderBy('created_at')
             ->get();
